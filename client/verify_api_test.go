@@ -1,8 +1,8 @@
 package client_test
 
 import (
+	"github.com/VerifyTests/Verify.Go/verifier"
 	"github.com/google/uuid"
-	"github.com/heskandari/Verify.Go/verifier"
 	"strings"
 	"testing"
 	"time"

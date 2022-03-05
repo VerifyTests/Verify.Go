@@ -1,4 +1,4 @@
-module github.com/heskandari/Verify.Go
+module github.com/VerifyTests/Verify.Go
 
 go 1.17
 

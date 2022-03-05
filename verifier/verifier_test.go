@@ -1,7 +1,7 @@
 package verifier_test
 
 import (
-	"github.com/heskandari/Verify.Go/verifier"
+	"github.com/VerifyTests/Verify.Go/verifier"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"strings"

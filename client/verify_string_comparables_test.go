@@ -1,7 +1,7 @@
 package client
 
 import (
-	"github.com/heskandari/Verify.Go/verifier"
+	"github.com/VerifyTests/Verify.Go/verifier"
 	"testing"
 )
 

@@ -1,12 +1,9 @@
 package verifier
 
 import (
-	"github.com/heskandari/Verify.Go/diff"
+	"github.com/VerifyTests/Verify.Go/diff"
 	"strings"
 )
-
-//var fileAppenders = make([]FileAppenderFunc, 0)
-//var jsonAppenders = make([]JSONAppenderFunc, 0)
 
 type verifySettings struct {
 	directory                        string

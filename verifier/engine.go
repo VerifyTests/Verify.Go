@@ -1,7 +1,7 @@
 package verifier
 
 import (
-	"github.com/heskandari/Verify.Go/diff"
+	"github.com/VerifyTests/Verify.Go/diff"
 	"strings"
 )
 
