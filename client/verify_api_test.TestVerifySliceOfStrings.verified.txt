@@ -1,0 +1,5 @@
+[
+    "This is a text",
+    "Second string",
+    "Guid_1"
+]

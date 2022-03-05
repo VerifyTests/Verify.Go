@@ -1,0 +1,7 @@
+{
+    "Date": "Time_1",
+    "IDs": [
+        "Guid_1",
+        "Guid_2"
+    ]
+}

@@ -1,0 +1,7 @@
+{
+    "FifthTimeString": "Time_2",
+    "FirstString": "String value",
+    "FourthTime": "Time_1",
+    "SecondUuidString": "Guid_1",
+    "ThirdUuid": "Guid_2"
+}

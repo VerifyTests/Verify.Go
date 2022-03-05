@@ -1,0 +1,16 @@
+{
+    "address": {
+        "country": "",
+        "street": ""
+    },
+    "children": [
+        "Guid_1",
+        "Guid_2"
+    ],
+    "date_of_birth": "Time_Zero",
+    "family_name": "Smith",
+    "given_name": "Jill",
+    "id": "Guid_Zero",
+    "spouse": "",
+    "title": "Mr."
+}

@@ -1,0 +1,26 @@
+[
+    {
+        "given_names": "John",
+        "family_name": "",
+        "spouse": "",
+        "address": {
+            "street": ""
+        },
+        "children": null,
+        "title": "Mr.",
+        "id": "Guid_Zero",
+        "dob": "Time_Zero"
+    },
+    {
+        "given_names": "Jill",
+        "family_name": "",
+        "spouse": "",
+        "address": {
+            "street": ""
+        },
+        "children": null,
+        "title": "Mrs.",
+        "id": "Guid_Zero",
+        "dob": "Time_Zero"
+    }
+]

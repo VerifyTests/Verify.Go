@@ -1,0 +1,16 @@
+{
+    "given_names": "John",
+    "family_name": "Smith",
+    "spouse": "Jill",
+    "address": {
+        "street": "4 Puddle Lane",
+        "country": "USA"
+    },
+    "children": [
+        "Sam",
+        "Mary"
+    ],
+    "title": "Mr.",
+    "id": "Guid_1",
+    "dob": "Time_1"
+}
