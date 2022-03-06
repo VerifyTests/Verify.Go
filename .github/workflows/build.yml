@@ -1,4 +1,4 @@
-name: build-pipeline
+name: build
 
 on:
   push:
