@@ -1,3 +1,7 @@
+# <img src='./icon.png' height='30px'> Verify
+
+[![Discussions](https://img.shields.io/badge/Verify-Discussions-yellow?svg=true&label=)](https://github.com/VerifyTests/Discussions/discussions) [![Build status](https://github.com/VerifyTests/Verify.Go/actions/workflows/build.yml/badge.svg)](https://github.com/VerifyTests/Verify.Go/actions/workflows/build.yml)
+
 Verify.Go is a snapshot tool for Go language that simplifies the assertion of complex data models and documents.
 
 Verify is called on the test result during the assertion phase. It serializes that result and stores it in a file that matches the test name. On the next test execution, the result is again serialized and compared to the existing file. The test will fail if the two snapshots do not match: either the change is unexpected, or the reference snapshot needs to be updated to the new result.
@@ -30,10 +34,10 @@ var person = Person{
     Children: []string{"Sam", "Mary"},
 }
 ```
-<sup><a href='/src/TargetLibrary/ClassBeingTested.cs#L1-L28' title='Snippet source file'>snippet source</a> | <a href='#snippet-classbeingtested' title='Start of snippet'>anchor</a></sup>
-<!-- endSnippet -->
 
 ### Go Tests
+
+Tests are created using standard Go test functions. A test file named `verify_api_test.go` can have following Test function:
 
 ```go
 import (
@@ -49,14 +53,14 @@ func TestVerifyingStructs(t *testing.T) {
 
 When the test is initially run will fail. If a diff tool is detected it will display the diff.
 
-![InitialDiff](/docs/InitialDiff.png)
+![InitialDiff](./docs/InitialDiff.png)
 
 To verify the result:
 
  * Use the diff tool to accept the changes, or
  * Manually copy the text to the new file
 
-#### Verified result
+### Verified result
 
 This will result in the `TestFile.TestVerifyingStructs.verified.txt` being created:
 
@@ -81,7 +85,7 @@ This will result in the `TestFile.TestVerifyingStructs.verified.txt` being creat
 
 ### Subsequent Verification
 
-If the implementation of `StructBeingTested` changes:
+If the implementation of the struct changes:
 
 ```go
 var person = Person{
@@ -100,6 +104,12 @@ var person = Person{
 ```
 
 And the test is re run it will fail.
+
+The Diff Tool will display the diff:
+
+![SecondDiff](./docs/SecondDiff.png)
+
+The same approach can be used to verify the results and the change to `Sample.Test.verified.txt` is committed to source control along with the change to the struct.
 
 ## Received and Verified
 
