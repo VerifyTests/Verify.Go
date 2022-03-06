@@ -2,6 +2,7 @@ package diff
 
 import "github.com/VerifyTests/Verify.Go/utils"
 
+//ToolDefinition specifies attributes of a diff tool
 type ToolDefinition struct {
 	Kind             ToolKind
 	Url              string
@@ -35,6 +36,7 @@ func newToolDefinition(tool ToolKind, url string, autoRefresh bool,
 		RequiresTarget:   requiresTarget}
 }
 
+//AllDefinedTools definition of all supported diff tools
 var AllDefinedTools = []*ToolDefinition{
 	defineBeyondCompare(),
 	defineVsCode(),

@@ -6,12 +6,12 @@ import (
 )
 
 func TestGetFileExtension(t *testing.T) {
-	assert.Equal(t, "txt", file.getFileExtension("textfile.txt"))
-	assert.Equal(t, "json", file.getFileExtension("textfile.json"))
-	assert.Equal(t, "txt", file.getFileExtension("txt"))
+	assert.Equal(t, "txt", File.GetFileExtension("textfile.txt"))
+	assert.Equal(t, "json", File.GetFileExtension("textfile.json"))
+	assert.Equal(t, "txt", File.GetFileExtension("txt"))
 }
 
 func TestFileReading(t *testing.T) {
-	content := file.readText("../_testdata/verifier_test.TestNilTargets.verified.txt")
+	content := File.ReadText("../_testdata/verifier_test.TestNilTargets.verified.txt")
 	assert.NotEmpty(t, content)
 }

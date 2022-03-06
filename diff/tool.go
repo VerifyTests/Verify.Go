@@ -190,7 +190,7 @@ func (t *tools) readToolOrder() orderResult {
 	if found {
 		order = t.parseEnvironment(diffOrder)
 	} else {
-		order = AllTools
+		order = allTools
 	}
 
 	return orderResult{

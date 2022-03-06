@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+// Files struct that provides file helper functions
 type Files struct {
 }
 

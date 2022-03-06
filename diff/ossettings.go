@@ -5,12 +5,14 @@ import (
 	"strings"
 )
 
+// OsSettings provides path to the diff file and require arguments for the launch
 type OsSettings struct {
 	TargetLeftArguments  BuildArguments
 	TargetRightArguments BuildArguments
 	ExePaths             []string
 }
 
+// NewOsSettings creates a new instance of OsSettings
 func NewOsSettings(
 	targetLeftArguments BuildArguments,
 	targetRightArguments BuildArguments,

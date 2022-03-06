@@ -6,10 +6,12 @@ import (
 	"strings"
 )
 
-var Guard = Guards{}
-
+// Guards struct that provides guard helper functions
 type Guards struct {
 }
+
+// Guard an instance of the Guards struct.
+var Guard = Guards{}
 
 // AgainstNullOrEmptySlice guards against the slice being nil or having zero length
 func (g *Guards) AgainstNullOrEmptySlice(values []string) {

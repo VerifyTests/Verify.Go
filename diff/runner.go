@@ -18,7 +18,7 @@ type runner struct {
 }
 
 const (
-	env_diffengine_disabled = "DiffEngine_Disabled"
+	envDiffEngineDisabled = "DiffEngine_Disabled"
 )
 
 type systemEnvReader struct{}
@@ -27,6 +27,7 @@ func (s *systemEnvReader) LookupEnv(key string) (string, bool) {
 	return os.LookupEnv(key)
 }
 
+// Launch a new diff tool
 func Launch(tempFile, targetFile string) LaunchResult {
 	runner := newRunner(&systemEnvReader{})
 	return runner.Launch(tempFile, targetFile)
@@ -52,7 +53,7 @@ func Kill(tempFile, targetFile string) {
 		return
 	}
 
-	command := diffTool.BuildCommand(tempFile, targetFile)
+	command := diffTool.buildCommand(tempFile, targetFile)
 	runner.proc.Kill(command)
 }
 
@@ -66,7 +67,7 @@ func newRunner(reader EnvReader) *runner {
 		logger:     newLogger("runner"),
 	}
 
-	variable, found := reader.LookupEnv(env_diffengine_disabled)
+	variable, found := reader.LookupEnv(envDiffEngineDisabled)
 	if !found {
 		variable = ""
 	}
@@ -108,7 +109,7 @@ func (r *runner) innerLaunch(tryResolveTool TryResolveTool, tempFile, targetFile
 		return result
 	}
 
-	args, cmd := tool.CommandAndArguments(tempFile, targetFile)
+	args, cmd := tool.commandAndArguments(tempFile, targetFile)
 
 	_, found := r.proc.GetProcessInfo(cmd)
 	if found {

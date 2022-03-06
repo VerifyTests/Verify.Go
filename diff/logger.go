@@ -11,6 +11,7 @@ type stdLogger struct {
 	err  *log.Logger
 }
 
+// Logger interface to log info and error logs
 type Logger interface {
 	Error(err error)
 	Info(format string, args ...interface{})
@@ -25,6 +26,7 @@ func newLogger(ns string) Logger {
 	}
 }
 
+// Error logs an error message
 func (l *stdLogger) Error(err error) {
 	if err == nil {
 		return
@@ -32,6 +34,7 @@ func (l *stdLogger) Error(err error) {
 	_ = l.info.Output(2, err.Error())
 }
 
+// Info logs an info message
 func (l *stdLogger) Info(format string, args ...interface{}) {
 	_ = l.info.Output(2, fmt.Sprintf(format, args...))
 }
