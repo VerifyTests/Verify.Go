@@ -10,23 +10,26 @@ import (
 	"strings"
 )
 
-type fileHelper struct {
+type Files struct {
 }
 
-var File = fileHelper{}
-var ByteOrderMarkAsString = string('\uFEFF')
+// File an instance of the Files struct.
+var File = Files{}
 
-func (f *fileHelper) GetFileNameWithoutExtension(fileName string) string {
+// GetFileNameWithoutExtension returns the name of the file without its extension.
+func (f *Files) GetFileNameWithoutExtension(fileName string) string {
 	return strings.TrimSuffix(filepath.Base(fileName), filepath.Ext(fileName))
 }
 
-func (f *fileHelper) DeleteIfEmpty(path string) {
-	if f.Exists(path) && f.isFileEmpty(path) {
+// DeleteIfEmpty deletes the file at the path if it is empty
+func (f *Files) DeleteIfEmpty(path string) {
+	if f.Exists(path) && f.IsFileEmpty(path) {
 		f.Delete(path)
 	}
 }
 
-func (f *fileHelper) isFileEmpty(path string) bool {
+// IsFileEmpty checks if the file at the path is empty
+func (f *Files) IsFileEmpty(path string) bool {
 	info, err := os.Stat(path)
 	if err != nil {
 		panic(fmt.Sprintf("failed to get stat of the file at %s", path))
@@ -34,14 +37,16 @@ func (f *fileHelper) isFileEmpty(path string) bool {
 	return info.Size() == 0
 }
 
-func (f *fileHelper) Exists(path string) bool {
+// Exists check if a file exists at the provided path
+func (f *Files) Exists(path string) bool {
 	if _, err := os.Stat(path); err == nil {
 		return true
 	}
 	return false
 }
 
-func (f *fileHelper) WriteText(filePath string, text string) {
+// WriteText writes the provided text to the file
+func (f *Files) WriteText(filePath string, text string) {
 	var encodedText = []byte(text)
 	err := ioutil.WriteFile(filePath, encodedText, 0600)
 	if err != nil {
@@ -49,7 +54,8 @@ func (f *fileHelper) WriteText(filePath string, text string) {
 	}
 }
 
-func (f *fileHelper) ReadText(filePath string) []byte {
+// ReadText reads the content of the file as []byte
+func (f *Files) ReadText(filePath string) []byte {
 	buf := bytes.NewBuffer(nil)
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -69,7 +75,8 @@ func (f *fileHelper) ReadText(filePath string) []byte {
 	return buf.Bytes()
 }
 
-func (f *fileHelper) Delete(path string) {
+// Delete deletes the file at the path if exists
+func (f *Files) Delete(path string) {
 	if f.Exists(path) {
 		err := os.Remove(path)
 		if err != nil {
@@ -78,7 +85,8 @@ func (f *fileHelper) Delete(path string) {
 	}
 }
 
-func (f *fileHelper) Move(sourcePath, destPath string) {
+// Move moves the source file to the destination
+func (f *Files) Move(sourcePath, destPath string) {
 	inputFile, err := os.Open(sourcePath)
 	if err != nil {
 		panic(fmt.Sprintf("couldn't open source file: %s", err))
@@ -102,11 +110,13 @@ func (f *fileHelper) Move(sourcePath, destPath string) {
 	}
 }
 
-func (f *fileHelper) close(file *os.File) {
+func (f *Files) close(file *os.File) {
 	_ = file.Close()
 }
 
-func (f *fileHelper) TryCreateFile(path string, useEmptyStringForTextFiles bool) bool {
+// TryCreateFile creates a file at the path. If useEmptyStringForTextFiles is set and the
+// file extension is text, creates an empty file with the provided name.
+func (f *Files) TryCreateFile(path string, useEmptyStringForTextFiles bool) bool {
 	Guard.AgainstEmpty(path)
 
 	extension := f.GetFileExtension(path)
@@ -130,7 +140,7 @@ func (f *fileHelper) TryCreateFile(path string, useEmptyStringForTextFiles bool)
 	//TODO: Implement default paths for other file types (jpeg)
 }
 
-func (f *fileHelper) tryCreateDir(path string) {
+func (f *Files) tryCreateDir(path string) {
 	dir, err := filepath.Abs(filepath.Dir(path))
 	if err != nil {
 		panic(fmt.Sprintf("Failed to get base directory from %s", path))
@@ -144,7 +154,8 @@ func (f *fileHelper) tryCreateDir(path string) {
 	}
 }
 
-func (f *fileHelper) FileOrDirectoryExists(path string) (bool, error) {
+// FileOrDirectoryExists checks if a file or directory exists
+func (f *Files) FileOrDirectoryExists(path string) (bool, error) {
 	_, err := os.Stat(path)
 	if err == nil {
 		return true, nil
@@ -155,14 +166,16 @@ func (f *fileHelper) FileOrDirectoryExists(path string) (bool, error) {
 	return false, err
 }
 
-func (f *fileHelper) CreateDirectory(directory string) error {
+// CreateDirectory creates a directory
+func (f *Files) CreateDirectory(directory string) error {
 	if !f.Exists(directory) {
 		return os.Mkdir(directory, 644)
 	}
 	return nil
 }
 
-func (f *fileHelper) GetFileExtension(extensionOrPath string) string {
+// GetFileExtension returns the extension of the file
+func (f *Files) GetFileExtension(extensionOrPath string) string {
 
 	if !strings.ContainsAny(extensionOrPath, ".") {
 		return extensionOrPath
@@ -177,7 +190,8 @@ func (f *fileHelper) GetFileExtension(extensionOrPath string) string {
 	return ext
 }
 
-func (f *fileHelper) IsText(extensionOrPath string) bool {
+// IsText determines if an extension is a text file
+func (f *Files) IsText(extensionOrPath string) bool {
 	var extension = f.GetFileExtension(extensionOrPath)
 	for _, txt := range textExtensions {
 		if extension == txt {
@@ -187,7 +201,8 @@ func (f *fileHelper) IsText(extensionOrPath string) bool {
 	return false
 }
 
-func (f *fileHelper) GetFileName(path string) string {
+// GetFileName returns the name of the file from the path
+func (f *Files) GetFileName(path string) string {
 	return filepath.Base(path)
 }
 

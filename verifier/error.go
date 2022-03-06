@@ -18,7 +18,7 @@ type failingMessageBuilder struct {
 	testName      string
 }
 
-func (b *failingMessageBuilder) Build() string {
+func (b *failingMessageBuilder) build() string {
 	builder := strings.Builder{}
 
 	builder.WriteRune('\n')

@@ -57,7 +57,7 @@ func TestFinderNonExistingFile(t *testing.T) {
 }
 
 func TestFinderWildcardInDirectory(t *testing.T) {
-	var path, _ = filepath.Abs("../_test*/*/dir1/TextFile1.txt")
+	var path, _ = filepath.Abs("../_testdata/*/dir1/TextFile1.txt")
 	var finder = newFinder()
 
 	result, found := finder.TryFind(path)

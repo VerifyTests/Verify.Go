@@ -84,7 +84,7 @@ func newInnerVerifier(t testingT, settings *verifySettings) *innerVerifier {
 	return verifier
 }
 
-func (v *innerVerifier) VerifyInner(target interface{}, cleanup CleanupFunc, targets []Target) {
+func (v *innerVerifier) verifyInner(target interface{}, cleanup CleanupFunc, targets []Target) {
 	if builder, extension, found := v.tryGetTargetBuilder(target); found {
 		v.scrubber.Apply(extension, builder, v.settings)
 
@@ -93,20 +93,21 @@ func (v *innerVerifier) VerifyInner(target interface{}, cleanup CleanupFunc, tar
 		targets = append([]Target{*stringTarget}, targets...)
 	}
 
-	targets = append(targets, v.settings.GetFileAppenders()...)
+	targets = append(targets, v.settings.getFileAppenders()...)
 
 	engine := newEngine(v.testing, v.outputDirectory, v.settings, v.verifiedFiles, v.getFileNames, v.getIndexedFileNames)
 
-	engine.HandleResults(targets)
+	engine.handleResults(targets)
 
 	if cleanup != nil {
 		cleanup()
 	}
 
-	engine.ThrowIfRequired()
+	engine.throwIfRequired()
 }
 
-func (v *innerVerifier) VerifyStream(target []byte) {
+// verifyStream verifies a target of type []byte
+func (v *innerVerifier) verifyStream(target []byte) {
 	panic("not implemented")
 }
 
@@ -153,7 +154,7 @@ func (v *innerVerifier) tryGetTargetBuilder(target interface{}) (builder *string
 	return
 }
 
-func (v *innerVerifier) TryGetToString(target interface{}) (asStringResult, bool) {
+func (v *innerVerifier) tryGetToString(target interface{}) (asStringResult, bool) {
 	//TODO: implement SimpleName like conversion
 	typ := reflect2.TypeOf(target)
 	switch v := target.(type) {

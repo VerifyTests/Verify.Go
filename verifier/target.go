@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// Target contains the information about the underlying target being verified
 type Target struct {
 	stringData           string
 	stringBuilderData    *strings.Builder
@@ -54,18 +55,22 @@ func newStreamTarget(extension string, stream []byte) *Target {
 	}
 }
 
+// IsStringBuilder checks if the target is a strings.Builder type.
 func (t *Target) IsStringBuilder() bool {
 	return t.hasStringBuilderData
 }
 
+// IsString checks if the target is a string data
 func (t *Target) IsString() bool {
 	return t.hasStringData
 }
 
+// IsStream checks if the target is a binary data
 func (t *Target) IsStream() bool {
 	return t.hasStreamData
 }
 
+// GetStringBuilderData returns the underlying target data as strings.Builder
 func (t *Target) GetStringBuilderData() *strings.Builder {
 	if !t.hasStringBuilderData {
 		panic("Use `GetStreamData` or `GetStringData`")
@@ -73,6 +78,7 @@ func (t *Target) GetStringBuilderData() *strings.Builder {
 	return t.stringBuilderData
 }
 
+// GetStringData returns the underlying target data as a string
 func (t *Target) GetStringData() string {
 	if !t.hasStringData {
 		panic("Use `GetStreamData` or `GetStringBuilderData`")
@@ -80,6 +86,7 @@ func (t *Target) GetStringData() string {
 	return t.stringData
 }
 
+// GetStreamData returns the underlying target data as a stream
 func (t *Target) GetStreamData() []byte {
 	if !t.hasStreamData {
 		panic("Use `GetStringData` or `GetStringBuilderData`")
@@ -87,6 +94,7 @@ func (t *Target) GetStreamData() []byte {
 	return t.streamData
 }
 
+// GetExtension returns the extension of the target
 func (t *Target) GetExtension() string {
 	return t.extension
 }

@@ -6,12 +6,13 @@ import (
 	"strings"
 )
 
-var Guard = guardChecker{}
+var Guard = Guards{}
 
-type guardChecker struct {
+type Guards struct {
 }
 
-func (g *guardChecker) AgainstNullOrEmptySlice(values []string) {
+// AgainstNullOrEmptySlice guards against the slice being nil or having zero length
+func (g *Guards) AgainstNullOrEmptySlice(values []string) {
 	if values == nil {
 		panic("values provided is nil")
 	}
@@ -21,24 +22,28 @@ func (g *guardChecker) AgainstNullOrEmptySlice(values []string) {
 	}
 }
 
-func (g *guardChecker) AgainstEmpty(value string) {
+// AgainstEmpty guards against string being empty
+func (g *Guards) AgainstEmpty(value string) {
 	if len(value) == 0 || value == "" {
 		panic("value was expected but was nil or empty")
 	}
 }
 
-func (g *guardChecker) AgainstBadExtension(value string) {
+// AgainstBadExtension guards agaist having a "." in the provided file extension.
+func (g *Guards) AgainstBadExtension(value string) {
 	if strings.HasPrefix(value, ".") {
 		panic("Must not start with a period ('.').")
 	}
 }
 
-func (g *guardChecker) GuardFiles(tempFile, targetFile string) {
+// GuardFiles checks if the files exists and the have content
+func (g *Guards) GuardFiles(tempFile, targetFile string) {
 	g.FileExists(tempFile)
 	g.AgainstEmpty(targetFile)
 }
 
-func (g *guardChecker) FileExists(path string) {
+// FileExists checks if a file exists at the provided path
+func (g *Guards) FileExists(path string) {
 	g.AgainstEmpty(path)
 	if _, err := os.Stat(path); err != nil {
 		panic(fmt.Sprintf("File not found. Path: %s", path))

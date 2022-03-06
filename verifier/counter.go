@@ -14,6 +14,7 @@ type countHolder struct {
 	counterLocker *sync.Mutex
 }
 
+// GetNextID returns the next ID to be used by the scrubber
 func (c *countHolder) GetNextID(input interface{}) int {
 	c.counterLocker.Lock()
 	defer c.counterLocker.Unlock()
@@ -29,6 +30,7 @@ func (c *countHolder) GetNextID(input interface{}) int {
 	return c.currentID
 }
 
+// GetNextUUID returns the next id to be used by the UUID scrubber
 func (c *countHolder) GetNextUUID(input uuid.UUID) int {
 	c.counterLocker.Lock()
 	defer c.counterLocker.Unlock()
@@ -43,6 +45,7 @@ func (c *countHolder) GetNextUUID(input uuid.UUID) int {
 	return c.currentGUID
 }
 
+// GetNextTime returns the next id to be used by the time.Time scrubber
 func (c *countHolder) GetNextTime(input time.Time) int {
 	c.counterLocker.Lock()
 	defer c.counterLocker.Unlock()

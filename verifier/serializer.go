@@ -42,11 +42,11 @@ func newSerializer(settings *verifySettings, scrubber *dataScrubber) *serializer
 }
 
 func (s *serializer) registerExtensions() {
-	s.json.RegisterTypeEncoder(stringType.String(), NewStringEncoder(s))
-	s.json.RegisterTypeEncoder(stringerType.String(), NewStringerEncoder(s))
-	s.json.RegisterTypeEncoder(uuidType.String(), NewUUIDEncoder(s))
-	s.json.RegisterTypeEncoder(timeType.String(), NewTimeEncoder(s))
-	s.json.RegisterTypeEncoder(textMarshalerType.String(), NewTextMarshallerEncoder(s))
+	s.json.RegisterTypeEncoder(stringType.String(), newStringEncoder(s))
+	s.json.RegisterTypeEncoder(stringerType.String(), newStringerEncoder(s))
+	s.json.RegisterTypeEncoder(uuidType.String(), newUUIDEncoder(s))
+	s.json.RegisterTypeEncoder(timeType.String(), newTimeEncoder(s))
+	s.json.RegisterTypeEncoder(textMarshalerType.String(), newTextMarshallerEncoder(s))
 }
 
 func createMarshaller() jsoniter.API {
@@ -95,67 +95,57 @@ func (s *serializer) toJSON(v interface{}) string {
 	return r
 }
 
-type UUIDEncoder struct{ serializer *serializer }
-type TextMarshallerEncoder struct{ serializer *serializer }
-type TimeEncoder struct{ serializer *serializer }
-type StringerEncoder struct{ serializer *serializer }
-type StringEncoder struct{ serializer *serializer }
+type encoderUUID struct{ serializer *serializer }
+type encoderTextMarshaller struct{ serializer *serializer }
+type encoderTime struct{ serializer *serializer }
+type encoderStringer struct{ serializer *serializer }
+type encoderString struct{ serializer *serializer }
 
-func NewStringerEncoder(s *serializer) jsoniter.ValEncoder {
-	return &StringerEncoder{
+func newStringerEncoder(s *serializer) jsoniter.ValEncoder {
+	return &encoderStringer{
 		serializer: s,
 	}
 }
 
-func NewStringEncoder(s *serializer) jsoniter.ValEncoder {
-	return &StringEncoder{
+func newStringEncoder(s *serializer) jsoniter.ValEncoder {
+	return &encoderString{
 		serializer: s,
 	}
 }
 
-func NewTextMarshallerEncoder(s *serializer) jsoniter.ValEncoder {
-	return &TextMarshallerEncoder{
+func newTextMarshallerEncoder(s *serializer) jsoniter.ValEncoder {
+	return &encoderTextMarshaller{
 		serializer: s,
 	}
 }
 
-func NewTimeEncoder(s *serializer) jsoniter.ValEncoder {
-	return &TimeEncoder{
+func newTimeEncoder(s *serializer) jsoniter.ValEncoder {
+	return &encoderTime{
 		serializer: s,
 	}
 }
 
-func NewUUIDEncoder(s *serializer) jsoniter.ValEncoder {
-	return &UUIDEncoder{
+func newUUIDEncoder(s *serializer) jsoniter.ValEncoder {
+	return &encoderUUID{
 		serializer: s,
 	}
 }
 
-func (t UUIDEncoder) IsEmpty(ptr unsafe.Pointer) bool {
-	//val := (*uuid.UUID)(ptr)
-	//if val == nil {
-	//	return true
-	//}
-	//
-	//guid := *val
-	//if guid == uuid.Nil {
-	//	return true
-	//}
-
+func (t encoderUUID) IsEmpty(ptr unsafe.Pointer) bool {
 	return false
 }
 
-func (t UUIDEncoder) Encode(ptr unsafe.Pointer, stream *jsoniter.Stream) {
+func (t encoderUUID) Encode(ptr unsafe.Pointer, stream *jsoniter.Stream) {
 	val := (*uuid.UUID)(ptr)
 	stream.WriteString(t.serializer.convertUUID(*val))
 }
 
-func (t TextMarshallerEncoder) IsEmpty(ptr unsafe.Pointer) bool {
+func (t encoderTextMarshaller) IsEmpty(ptr unsafe.Pointer) bool {
 	val := (*encoding.TextMarshaler)(ptr)
 	return val == nil
 }
 
-func (t TextMarshallerEncoder) Encode(ptr unsafe.Pointer, stream *jsoniter.Stream) {
+func (t encoderTextMarshaller) Encode(ptr unsafe.Pointer, stream *jsoniter.Stream) {
 	val := *(*encoding.TextMarshaler)(ptr)
 	str, err := val.MarshalText()
 	if err != nil {
@@ -164,32 +154,32 @@ func (t TextMarshallerEncoder) Encode(ptr unsafe.Pointer, stream *jsoniter.Strea
 	stream.WriteString(t.serializer.convertString(string(str)))
 }
 
-func (t StringEncoder) IsEmpty(ptr unsafe.Pointer) bool {
+func (t encoderString) IsEmpty(ptr unsafe.Pointer) bool {
 	val := (*string)(ptr)
 	return val == nil
 }
 
-func (t StringEncoder) Encode(ptr unsafe.Pointer, stream *jsoniter.Stream) {
+func (t encoderString) Encode(ptr unsafe.Pointer, stream *jsoniter.Stream) {
 	val := *(*string)(ptr)
 	stream.WriteString(t.serializer.convertString(val))
 }
 
-func (t StringerEncoder) IsEmpty(ptr unsafe.Pointer) bool {
+func (t encoderStringer) IsEmpty(ptr unsafe.Pointer) bool {
 	val := (*fmt.Stringer)(ptr)
 	return val == nil
 }
 
-func (t StringerEncoder) Encode(ptr unsafe.Pointer, stream *jsoniter.Stream) {
+func (t encoderStringer) Encode(ptr unsafe.Pointer, stream *jsoniter.Stream) {
 	val := *(*fmt.Stringer)(ptr)
 	stream.WriteString(t.serializer.convertString(val.String()))
 }
 
-func (t TimeEncoder) IsEmpty(ptr unsafe.Pointer) bool {
+func (t encoderTime) IsEmpty(ptr unsafe.Pointer) bool {
 	val := (*time.Time)(ptr)
 	return val == nil
 }
 
-func (t TimeEncoder) Encode(ptr unsafe.Pointer, stream *jsoniter.Stream) {
+func (t encoderTime) Encode(ptr unsafe.Pointer, stream *jsoniter.Stream) {
 	val := *(*time.Time)(ptr)
 	stream.WriteString(t.serializer.convertTime(val))
 }
