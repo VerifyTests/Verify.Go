@@ -35,8 +35,8 @@ func (p *processCleaner) refresh() {
 func (p *processCleaner) tryTerminateProcess(pid int32) bool {
 	proc, err := process.NewProcess(pid)
 	if err == nil && proc != nil {
-		running, err := proc.IsRunning()
-		if running {
+		running, runErr := proc.IsRunning()
+		if runErr == nil && running {
 			err = proc.Terminate()
 			return err == nil
 		}
