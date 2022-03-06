@@ -59,9 +59,8 @@ const (
 	Guiffy           ToolKind = "Guiffy"
 	ExamDiff         ToolKind = "ExamDiff"
 	Diffinity        ToolKind = "Diffinity"
-	VisualStudio     ToolKind = "VisualStudio"
 	VisualStudioCode ToolKind = "VisualStudioCode"
-	Rider            ToolKind = "Rider"
+	GoLand           ToolKind = "GoLand"
 	Vim              ToolKind = "Vim"
 	Neovim           ToolKind = "Neovim"
 )
@@ -95,9 +94,8 @@ var AllTools = []ToolKind{
 	Guiffy,
 	ExamDiff,
 	Diffinity,
-	VisualStudio,
 	VisualStudioCode,
-	Rider,
+	GoLand,
 	Vim,
 	Neovim,
 }

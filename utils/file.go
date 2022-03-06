@@ -109,13 +109,20 @@ func (f *fileHelper) close(file *os.File) {
 func (f *fileHelper) TryCreateFile(path string, useEmptyStringForTextFiles bool) bool {
 	Guard.AgainstEmpty(path)
 
-	extension := f.GetFileNameWithoutExtension(path)
+	extension := f.GetFileExtension(path)
 	if useEmptyStringForTextFiles && f.IsText(extension) {
 		f.tryCreateDir(path)
-		if f.Exists(path) {
+		exists, err := f.FileOrDirectoryExists(path)
+		if err != nil {
+			panic(fmt.Sprintf("Failed to check if file exists: %s", err))
+		}
+
+		if exists {
 			f.Delete(path)
 		}
-		f.WriteText(path, ByteOrderMarkAsString)
+
+		f.WriteText(path, "")
+
 		return true
 	}
 
@@ -124,7 +131,11 @@ func (f *fileHelper) TryCreateFile(path string, useEmptyStringForTextFiles bool)
 }
 
 func (f *fileHelper) tryCreateDir(path string) {
-	dir := filepath.Base(path)
+	dir, err := filepath.Abs(filepath.Dir(path))
+	if err != nil {
+		panic(fmt.Sprintf("Failed to get base directory from %s", path))
+	}
+
 	if len(dir) > 0 {
 		err := f.CreateDirectory(dir)
 		if err != nil {
@@ -133,8 +144,22 @@ func (f *fileHelper) tryCreateDir(path string) {
 	}
 }
 
+func (f *fileHelper) FileOrDirectoryExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
+}
+
 func (f *fileHelper) CreateDirectory(directory string) error {
-	return os.Mkdir(directory, 644)
+	if !f.Exists(directory) {
+		return os.Mkdir(directory, 644)
+	}
+	return nil
 }
 
 func (f *fileHelper) GetFileExtension(extensionOrPath string) string {

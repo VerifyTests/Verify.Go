@@ -653,11 +653,11 @@ func defineRider() *ToolDefinition {
 	}
 
 	return &ToolDefinition{
-		Kind:             Rider,
-		Url:              "https://www.jetbrains.com/rider/",
+		Kind:             GoLand,
+		Url:              "https://www.jetbrains.com/go/",
 		Cost:             Paid,
 		AutoRefresh:      false,
-		IsMdi:            false,
+		IsMdi:            true,
 		SupportsText:     true,
 		RequiresTarget:   true,
 		BinaryExtensions: []string{},
@@ -665,21 +665,21 @@ func defineRider() *ToolDefinition {
 			TargetLeftArguments:  leftArgs,
 			TargetRightArguments: rightArgs,
 			ExePaths: []string{
-				"%HOME%/Library/Application Support/JetBrains/Toolbox/apps/Rider/*/*/Rider EAP.app/Contents/MacOS/rider",
-				"%HOME%/Library/Application Support/JetBrains/Toolbox/apps/Rider/*/*/Rider.app/Contents/MacOS/rider",
-				"/Applications/Rider EAP.app/Contents/MacOS/rider",
-				"/Applications/Rider.app/Contents/MacOS/rider",
+				"%HOME%/Library/Application Support/JetBrains/Toolbox/apps/GoLand/*/*/GoLand EAP.app/Contents/MacOS/goland",
+				"%HOME%/Library/Application Support/JetBrains/Toolbox/apps/GoLand/*/*/GoLand.app/Contents/MacOS/goland",
+				"/Applications/GoLand EAP.app/Contents/MacOS/goland",
+				"/Applications/GoLand.app/Contents/MacOS/goland",
 			},
 		},
 		Windows: OsSettings{
 			TargetLeftArguments:  leftArgs,
 			TargetRightArguments: rightArgs,
 			ExePaths: []string{
-				"%LOCALAPPDATA%\\JetBrains\\Installations\\Rider*\\bin\\rider64.exe",
-				"%ProgramFiles%\\JetBrains\\JetBrains Rider *\\bin\\rider64.exe",
-				"%JetBrains Rider%\\rider64.exe",
-				"%LOCALAPPDATA%\\JetBrains\\Toolbox\\apps\\Rider\\*\\*\\bin\\rider64.exe",
-				"%UserProfile%\\scoop\\apps\\rider\\current\\IDE\\bin\\rider64.exe",
+				"%LOCALAPPDATA%\\JetBrains\\Installations\\GoLand*\\bin\\goland64.exe",
+				"%ProgramFiles%\\JetBrains\\JetBrains GoLand *\\bin\\goland64.exe",
+				"%JetBrains GoLand%\\goland64.exe",
+				"%LOCALAPPDATA%\\JetBrains\\Toolbox\\apps\\GoLand\\*\\*\\bin\\goland64.exe",
+				"%UserProfile%\\scoop\\apps\\goland\\current\\IDE\\bin\\goland64.exe",
 			},
 		},
 		Linux: OsSettings{
