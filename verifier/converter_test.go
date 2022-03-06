@@ -48,7 +48,7 @@ func TestStringVerifier(t *testing.T) {
 }
 
 func getString(inner *innerVerifier, target interface{}) string {
-	r, ok := inner.TryGetToString(target)
+	r, ok := inner.tryGetToString(target)
 	if !ok {
 		panic(fmt.Sprintf("could not convert to string from %v", target))
 	}

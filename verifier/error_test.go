@@ -48,7 +48,7 @@ func TestErrorReporting(t *testing.T) {
 		delete:        deletedFiles,
 	}
 
-	msg := builder.Build()
+	msg := builder.build()
 
 	assert.NotEmpty(t, msg)
 	assert.Contains(t, msg, "Deleted")

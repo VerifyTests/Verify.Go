@@ -65,6 +65,7 @@ func add(m map[string]struct{}, value string) {
 	}
 }
 
+// Apply applies all the registered scrubbers to the target
 func (s *dataScrubber) Apply(extension string, target *strings.Builder, settings *verifySettings) {
 	stringData := target.String()
 	target.Reset()
@@ -90,6 +91,7 @@ func (s *dataScrubber) Apply(extension string, target *strings.Builder, settings
 	target.WriteString(stringData)
 }
 
+// ScrubTime scrubs time.Time values
 func (s *dataScrubber) ScrubTime(time time.Time) string {
 	if time.IsZero() {
 		return "Time_Zero"
@@ -99,6 +101,7 @@ func (s *dataScrubber) ScrubTime(time time.Time) string {
 	return fmt.Sprintf("Time_%d", next)
 }
 
+// ScrubGUID scrubs the UUID values
 func (s *dataScrubber) ScrubGUID(guid uuid.UUID) string {
 	if guid == uuid.Nil {
 		return "Guid_Zero"
@@ -108,6 +111,7 @@ func (s *dataScrubber) ScrubGUID(guid uuid.UUID) string {
 	return fmt.Sprintf("Guid_%d", next)
 }
 
+// ScrubMachineName scrubs current hostname from the target
 func (s *dataScrubber) ScrubMachineName(target string) string {
 	if host, err := os.Hostname(); err == nil {
 		if strings.Contains(target, host) {
@@ -118,6 +122,7 @@ func (s *dataScrubber) ScrubMachineName(target string) string {
 	return target
 }
 
+// ScrubStackTrace scrubs the stacktrace
 func (s *dataScrubber) ScrubStackTrace(stacktrace string, removeParams bool) string {
 	if len(stacktrace) == 0 {
 		return stacktrace

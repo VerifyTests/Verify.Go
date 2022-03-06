@@ -4,50 +4,54 @@ import (
 	"reflect"
 )
 
+// Verifier is the main interface for verification process.
 type Verifier interface {
 	Verify(target interface{})
 }
 
+// Verify verifies the passed target with the default settings.
 func Verify(t testingT, target interface{}) {
 	VerifyWithSetting(t, NewSettings(), target)
 }
 
+// VerifyWithSetting verifies the passed target with the provided settings.
 func VerifyWithSetting(t testingT, settings VerifySettings, target interface{}) {
 	verifier := NewVerifier(t, settings)
 	verifier.Verify(target)
 }
 
+// Verify verifies the passed target with the associated settings
 func (v *verifier) Verify(target interface{}) {
 	defer v.settings.runAfterVerify()
 
 	if isNil(target) {
 		v.assertExtensionIsNull()
-		v.inner.VerifyInner("nil", nil, emptyTargets)
+		v.inner.verifyInner("nil", nil, emptyTargets)
 		return
 	}
 
-	if stringResult, ok := v.inner.TryGetToString(target); ok {
+	if stringResult, ok := v.inner.tryGetToString(target); ok {
 		if len(stringResult.Extension) > 0 {
 			v.settings.UseExtension(stringResult.Extension)
 		}
 
 		value := stringResult.Value
 		if len(value) == 0 {
-			v.inner.VerifyInner("emptyString", nil, emptyTargets)
+			v.inner.verifyInner("emptyString", nil, emptyTargets)
 			return
 		}
 
-		v.inner.VerifyInner(value, nil, emptyTargets)
+		v.inner.verifyInner(value, nil, emptyTargets)
 		return
 	}
 
 	if target, ok := target.([]byte); ok {
-		v.inner.VerifyStream(target)
+		v.inner.verifyStream(target)
 		return
 	}
 
 	v.assertExtensionIsNull()
-	v.inner.VerifyInner(target, nil, emptyTargets)
+	v.inner.verifyInner(target, nil, emptyTargets)
 }
 
 func (v *verifier) assertExtensionIsNull() {
@@ -64,6 +68,7 @@ type verifier struct {
 	counter  *countHolder
 }
 
+// NewVerifier creates a new Verifier with the associated VerifySettings settings
 func NewVerifier(t testingT, settings VerifySettings) Verifier {
 	if st, ok := settings.(*verifySettings); ok {
 		return &verifier{

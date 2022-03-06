@@ -32,6 +32,8 @@ func Launch(tempFile, targetFile string) LaunchResult {
 	return runner.Launch(tempFile, targetFile)
 }
 
+// Kill the diff tool if it doesn't support MDI, is already running and has been
+// opened to display a specific temp and target file.
 func Kill(tempFile, targetFile string) {
 	runner := newRunner(&systemEnvReader{})
 	if runner.Disabled {
@@ -76,8 +78,9 @@ func newRunner(reader EnvReader) *runner {
 	return runner
 }
 
+// Launch runs a new diff tool that can handle the target file based on the file's extension.
 func (r *runner) Launch(tempFile, targetFile string) LaunchResult {
-	guardFiles(tempFile, targetFile)
+	utils.Guard.GuardFiles(tempFile, targetFile)
 
 	finder := func() (resolved *ResolvedTool, found bool) {
 		extension := utils.File.GetFileExtension(tempFile)
@@ -87,8 +90,9 @@ func (r *runner) Launch(tempFile, targetFile string) LaunchResult {
 	return r.innerLaunch(finder, tempFile, targetFile)
 }
 
+// LaunchTool runs a specific diff tool
 func (r *runner) LaunchTool(kind ToolKind, tempFile, targetFile string) LaunchResult {
-	guardFiles(tempFile, targetFile)
+	utils.Guard.GuardFiles(tempFile, targetFile)
 
 	finder := func() (resolved *ResolvedTool, found bool) {
 		return r.tool.tryFind(kind)
@@ -127,12 +131,14 @@ func (r *runner) innerLaunch(tryResolveTool TryResolveTool, tempFile, targetFile
 	return StartedNewInstance
 }
 
+// KillIfMdi kills the diff tool if it does not support MDI
 func (r *runner) KillIfMdi(tool *ResolvedTool, command string) {
 	if !tool.IsMdi {
 		r.proc.Kill(command)
 	}
 }
 
+// ShouldExitLaunch checks if the launched diff tool should be exitted
 func (r *runner) ShouldExitLaunch(tryResolveTool TryResolveTool, targetFile string) (tool *ResolvedTool, result LaunchResult, exited bool) {
 	if r.Disabled {
 		return nil, Disabled, true
@@ -160,6 +166,7 @@ func (r *runner) tryCreate(tool *ResolvedTool, targetFile string) bool {
 	return true
 }
 
+// LaunchProcess runs an external process with given arguments
 func (r *runner) LaunchProcess(tool *ResolvedTool, arguments []string) int32 {
 
 	out := make(chan runResult)
@@ -172,9 +179,4 @@ func (r *runner) LaunchProcess(tool *ResolvedTool, arguments []string) int32 {
 	}
 
 	return res.pid
-}
-
-func guardFiles(tempFile, targetFile string) {
-	utils.Guard.FileExists(tempFile)
-	utils.Guard.AgainstEmpty(targetFile)
 }

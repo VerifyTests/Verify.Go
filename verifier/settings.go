@@ -39,6 +39,7 @@ type verifySettings struct {
 	onVerifyDelete                   VerifyDeleteFunc
 }
 
+// VerifySettings provides customization for the Verify process.
 type VerifySettings interface {
 	AutoVerify()
 	EnableDiff()
@@ -70,62 +71,77 @@ type VerifySettings interface {
 	TestCase(name string)
 }
 
+// OnVerifyDelete callback that is executed before a file is deleted
 func (v *verifySettings) OnVerifyDelete(fun VerifyDeleteFunc) {
 	v.onVerifyDelete = fun
 }
 
+// OnAfterVerify callback that is executed after the verify process
 func (v *verifySettings) OnAfterVerify(fun AfterVerifyFunc) {
 	v.onAfterVerify = fun
 }
 
+// OnBeforeVerify callback that is executed before the verify process
 func (v *verifySettings) OnBeforeVerify(fun BeforeVerifyFunc) {
 	v.onBeforeVerify = fun
 }
 
+// OnFirstVerify callback that is executed on the first verify
 func (v *verifySettings) OnFirstVerify(fun FirstVerifyFunc) {
 	v.onFirstVerify = fun
 }
 
+// OnVerifyMismatch callback that is executed when a mismatch happens
 func (v *verifySettings) OnVerifyMismatch(fun VerifyMismatchFunc) {
 	v.onVerifyMismatch = fun
 }
 
+// AutoVerify automatically accepts the received files
 func (v *verifySettings) AutoVerify() {
 	v.autoVerify = true
 }
 
+// UniqueForArchitecture create file names based on the runtime architecture
 func (v *verifySettings) UniqueForArchitecture() {
 	v.uniqueForArchitecture = true
 }
 
+// UniqueForOperatingSystem create file names based on the runtime operating system
 func (v *verifySettings) UniqueForOperatingSystem() {
 	v.uniqueForOperatingSystem = true
 }
 
+// UniqueForRuntime create file names based on the Go runtime versions
 func (v *verifySettings) UniqueForRuntime() {
 	v.uniqueForRuntime = true
 }
 
+// OmitContentFromError show the content differences when a mismatch occurs during verification
 func (v *verifySettings) OmitContentFromError() {
 	v.omitContentFromError = true
 }
 
+// EnableDiff enables the diff tools
 func (v *verifySettings) EnableDiff() {
 	v.diffEnabled = true
 }
 
+// UseStrictJSON use .json extension for the outputted files
 func (v *verifySettings) UseStrictJSON() {
 	v.strictJSON = true
 }
 
+// DontScrubGuids do not auto-scrub UUID values
 func (v *verifySettings) DontScrubGuids() {
 	v.scrubGuids = false
 }
 
+// DontScrubTimes do not auto-scrub time.Time values
 func (v *verifySettings) DontScrubTimes() {
 	v.scrubTimes = false
 }
 
+// UseExtension specify an extension to use for the outputted files
 func (v *verifySettings) UseExtension(extension string) {
 	utils.Guard.AgainstBadExtension(extension)
 	v.extension = extension
@@ -142,7 +158,7 @@ func (v *verifySettings) getJSONAppenders() []toAppend {
 	return result
 }
 
-func (v *verifySettings) GetFileAppenders() []Target {
+func (v *verifySettings) getFileAppenders() []Target {
 	result := make([]Target, 0)
 	for _, appender := range v.fileAppender {
 		stream := appender()
@@ -153,10 +169,12 @@ func (v *verifySettings) GetFileAppenders() []Target {
 	return result
 }
 
+// UseStreamComparer use the specified function for stream comparison
 func (v *verifySettings) UseStreamComparer(fun StreamComparerFunc) {
 	v.streamComparer = fun
 }
 
+// UseStringComparer use the specified function for string comparison
 func (v *verifySettings) UseStringComparer(fun StringComparerFunc) {
 	v.stringComparer = fun
 }
@@ -174,6 +192,7 @@ func (v *verifySettings) tryGetStringComparer(extension string) (StringComparerF
 	return nil, false
 }
 
+// UseDirectory place the output files in the specified directory
 func (v *verifySettings) UseDirectory(directory string) {
 	v.directory = directory
 }
@@ -185,14 +204,17 @@ func (v *verifySettings) extensionOrTxt() string {
 	return v.extension
 }
 
+// ScrubMachineName scrubs the machine name from the target data
 func (v *verifySettings) ScrubMachineName() {
 	v.AddScrubber(v.scrubber.ScrubMachineName)
 }
 
+// AddScrubber add a function to the front of the scrubber collections.
 func (v *verifySettings) AddScrubber(fun InstanceScrubber) {
 	v.instanceScrubbers = append(v.instanceScrubbers, fun)
 }
 
+// AddScrubberForExtension adds a function for a specified extension to the front of the scrubber collection.
 func (v *verifySettings) AddScrubberForExtension(extension string, fun InstanceScrubber) {
 	current, found := v.extensionMappedInstanceScrubbers[extension]
 	if !found {
@@ -204,6 +226,7 @@ func (v *verifySettings) AddScrubberForExtension(extension string, fun InstanceS
 	}
 }
 
+// ScrubLinesContainingAnyCase scrubs strings that match the data in the target
 func (v *verifySettings) ScrubLinesContainingAnyCase(stringToMatch ...string) {
 	removeLines := func(target string) string {
 		return v.scrubber.removeLinesContaining(target, true, stringToMatch...)
@@ -211,6 +234,7 @@ func (v *verifySettings) ScrubLinesContainingAnyCase(stringToMatch ...string) {
 	v.instanceScrubbers = append([]InstanceScrubber{removeLines}, v.instanceScrubbers...)
 }
 
+// ScrubLinesContaining scrubs the line containing specified strings
 func (v *verifySettings) ScrubLinesContaining(stringToMatch ...string) {
 	removeLines := func(target string) string {
 		return v.scrubber.removeLinesContaining(target, false, stringToMatch...)
@@ -218,10 +242,12 @@ func (v *verifySettings) ScrubLinesContaining(stringToMatch ...string) {
 	v.instanceScrubbers = append([]InstanceScrubber{removeLines}, v.instanceScrubbers...)
 }
 
+// ScrubInlineGuids scrubs inline UUID values with string types
 func (v *verifySettings) ScrubInlineGuids() {
 	v.instanceScrubbers = append([]InstanceScrubber{v.scrubber.replaceGuids}, v.instanceScrubbers...)
 }
 
+// ScrubLines scrub target lines with the provided function
 func (v *verifySettings) ScrubLines(fun RemoveLineFunc) {
 	filterLines := func(input string) string {
 		return v.scrubber.filterLines(input, fun)
@@ -229,6 +255,7 @@ func (v *verifySettings) ScrubLines(fun RemoveLineFunc) {
 	v.instanceScrubbers = append([]InstanceScrubber{filterLines}, v.instanceScrubbers...)
 }
 
+// ScrubLinesWithReplace scrubs target lines and replace with the value provided by the function
 func (v *verifySettings) ScrubLinesWithReplace(fun ReplaceLineFunc) {
 	filterLines := func(input string) string {
 		return v.scrubber.replaceLines(input, fun)
@@ -236,6 +263,7 @@ func (v *verifySettings) ScrubLinesWithReplace(fun ReplaceLineFunc) {
 	v.instanceScrubbers = append([]InstanceScrubber{filterLines}, v.instanceScrubbers...)
 }
 
+// ScrubEmptyLines scrubs all the empty lines from the target
 func (v *verifySettings) ScrubEmptyLines() {
 	isNullOrWhitespace := func(line string) bool {
 		return len(line) == 0 || strings.TrimSpace(line) == ""
@@ -246,6 +274,7 @@ func (v *verifySettings) ScrubEmptyLines() {
 	v.instanceScrubbers = append([]InstanceScrubber{filterLines}, v.instanceScrubbers...)
 }
 
+// TestCase specify a case name for the test.
 func (v *verifySettings) TestCase(name string) {
 	v.testCase = name
 }
@@ -280,6 +309,7 @@ func (v *verifySettings) runOnVerifyDelete(file string) {
 	}
 }
 
+// NewSettings returns a new default instance of the VerifySettings
 func NewSettings() VerifySettings {
 	return newSettings()
 }

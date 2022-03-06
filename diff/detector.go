@@ -14,19 +14,19 @@ func checkCI(reader EnvReader) CIDetected {
 	// Travis
 	// https://docs.travis-ci.com/user/environment-variables/#default-environment-variables
 	if lookupBuildEnvironment(reader, Appveyor) == "true" {
-		return CI_Detected
+		return Detected
 	}
 
 	// Jenkins
 	// https://wiki.jenkins.io/display/JENKINS/Building+a+software+project#Buildingasoftwareproject-belowJenkinsSetEnvironmentVariables
 	if len(lookupBuildEnvironment(reader, Jenkins)) > 0 {
-		return CI_Detected
+		return Detected
 	}
 
 	// GitHub Action
 	// https://help.github.com/en/actions/automating-your-workflow-with-github-actions/using-environment-variables#default-environment-variables
 	if len(lookupBuildEnvironment(reader, GitHub)) > 0 {
-		return CI_Detected
+		return Detected
 	}
 
 	// AzureDevops
@@ -35,28 +35,28 @@ func checkCI(reader EnvReader) CIDetected {
 	// Note that variables are upper-cased and '.' is replaced with '_' on Azure Pipelines.
 	// https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch#access-variables-through-the-environment
 	if len(lookupBuildEnvironment(reader, AzureDevOps)) > 0 {
-		return CI_Detected
+		return Detected
 	}
 
 	// TeamCity
 	// https://www.jetbrains.com/help/teamcity/predefined-build-parameters.html#PredefinedBuildParameters-ServerBuildProperties
 	if len(lookupBuildEnvironment(reader, TeamCity)) > 0 {
-		return CI_Detected
+		return Detected
 	}
 
 	// MyGet
 	// https://docs.myget.org/docs/reference/build-services#Available_Environment_Variables
 	if lookupBuildEnvironment(reader, MyGet) == "myget" {
-		return CI_Detected
+		return Detected
 	}
 
 	// GitLab
 	// https://docs.gitlab.com/ee/ci/variables/predefined_variables.html
 	if len(lookupBuildEnvironment(reader, GitLab)) > 0 {
-		return CI_Detected
+		return Detected
 	}
 
-	return CI_NotDetected
+	return NotDetected
 }
 
 func lookupBuildEnvironment(reader EnvReader, env BuildServerEnvironment) string {

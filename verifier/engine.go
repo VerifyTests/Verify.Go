@@ -40,7 +40,7 @@ func newEngine(
 	}
 }
 
-func (e *engine) HandleResults(targetList []Target) {
+func (e *engine) handleResults(targetList []Target) {
 	if len(targetList) == 1 {
 		target := targetList[0]
 		file := e.getFileNames(target.GetExtension())
@@ -64,7 +64,7 @@ func (e *engine) HandleResults(targetList []Target) {
 	}
 }
 
-func (e *engine) ThrowIfRequired() {
+func (e *engine) throwIfRequired() {
 	e.processEquals()
 
 	noChanges := len(e.newFiles) == 0 &&
@@ -83,7 +83,7 @@ func (e *engine) ThrowIfRequired() {
 
 	if !e.settings.autoVerify {
 		errorBuilder := e.newErrorBuilder()
-		e.testing.Errorf(errorBuilder.Build())
+		e.testing.Errorf(errorBuilder.build())
 	}
 }
 
