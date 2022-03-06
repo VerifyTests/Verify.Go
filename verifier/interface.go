@@ -2,6 +2,7 @@ package verifier
 
 import (
 	"fmt"
+	"github.com/VerifyTests/Verify.Go/utils"
 	"path"
 )
 
@@ -116,6 +117,6 @@ func newFilePair(extension, prefix string) FilePair {
 		VerifiedPath: verified,
 		ReceivedName: path.Base(received),
 		VerifiedName: path.Base(verified),
-		IsText:       file.isText(extension),
+		IsText:       utils.File.IsText(extension),
 	}
 }

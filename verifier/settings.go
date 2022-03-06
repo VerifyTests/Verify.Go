@@ -2,6 +2,7 @@ package verifier
 
 import (
 	"github.com/VerifyTests/Verify.Go/diff"
+	"github.com/VerifyTests/Verify.Go/utils"
 	"strings"
 )
 
@@ -126,7 +127,7 @@ func (v *verifySettings) DontScrubTimes() {
 }
 
 func (v *verifySettings) UseExtension(extension string) {
-	guard.AgainstBadExtension(extension)
+	utils.Guard.AgainstBadExtension(extension)
 	v.extension = extension
 }
 

@@ -2,6 +2,7 @@ package diff
 
 import (
 	"fmt"
+	"github.com/VerifyTests/Verify.Go/utils"
 	"os"
 	"strings"
 )
@@ -28,8 +29,8 @@ func (t *tools) tryFind(kind ToolKind) (tool *ResolvedTool, found bool) {
 }
 
 func (t *tools) tryFindForExtension(extension string) (tool *ResolvedTool, found bool) {
-	extension = file.getFileExtension(extension)
-	if file.isText(extension) {
+	extension = utils.File.GetFileExtension(extension)
+	if utils.File.IsText(extension) {
 		for _, tool := range t.resolved {
 			if tool.SupportsText {
 				return tool, true
@@ -141,7 +142,7 @@ func (t *tools) addTool(name string, diffTool ToolKind, autoRefresh bool, isMdi 
 	supportsText bool, requiresTarget bool, binaries []string, exePath string,
 	targetLeftArguments BuildArguments, targetRightArguments BuildArguments) (*ResolvedTool, bool) {
 
-	guard.AgainstEmpty(name)
+	utils.Guard.AgainstEmpty(name)
 	if t.toolExists(name) {
 		panic(fmt.Sprintf("Kind with Name already exists. Name: %s", name))
 	}
@@ -213,7 +214,7 @@ func (t *tools) parseEnvironment(diffOrder string) []ToolKind {
 func (t *tools) AddResolvedToolAtStart(tool *ResolvedTool) {
 	t.resolved = append([]*ResolvedTool{tool}, t.resolved...)
 	for _, ext := range tool.BinaryExtensions {
-		cleanedExtension := file.getFileExtension(ext)
+		cleanedExtension := utils.File.GetFileExtension(ext)
 		t.extensionLookup[cleanedExtension] = tool
 	}
 	t.pathLookup[tool.ExePath] = tool

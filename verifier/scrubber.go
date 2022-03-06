@@ -3,6 +3,7 @@ package verifier
 import (
 	"bufio"
 	"fmt"
+	"github.com/VerifyTests/Verify.Go/utils"
 	"github.com/google/uuid"
 	"os"
 	"regexp"
@@ -128,7 +129,7 @@ func (s *dataScrubber) ScrubStackTrace(stacktrace string, removeParams bool) str
 }
 
 func (s *dataScrubber) removeLinesContaining(input string, ignoreCase bool, stringToMatch ...string) string {
-	guard.AgainstNullOrEmptySlice(stringToMatch)
+	utils.Guard.AgainstNullOrEmptySlice(stringToMatch)
 
 	return s.filterLines(input, func(line string) bool {
 		return s.lineContains(line, ignoreCase, stringToMatch)

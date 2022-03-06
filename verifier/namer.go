@@ -42,19 +42,13 @@ func (n *namer) getRuntimeVersion() string {
 }
 
 func (n *namer) getOsPlatform() string {
-	if runtime.GOOS == "windows" {
+
+	switch runtime.GOOS {
+	case "windows":
 		return "windows"
-	}
-
-	if runtime.GOOS == "unix" {
+	case "unix", "linux":
 		return "linux"
-	}
-
-	if runtime.GOOS == "linux" {
-		return "linux"
-	}
-
-	if runtime.GOOS == "darwin" {
+	case "darwin":
 		return "macos"
 	}
 

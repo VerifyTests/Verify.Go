@@ -1,6 +1,9 @@
 package verifier
 
-import "strings"
+import (
+	"github.com/VerifyTests/Verify.Go/utils"
+	"strings"
+)
 
 type compare struct {
 }
@@ -8,16 +11,16 @@ type compare struct {
 var comparer = compare{}
 
 func (c *compare) Text(filePair FilePair, received string, settings *verifySettings) EqualityResult {
-	file.deleteIfEmpty(filePair.VerifiedPath)
-	if !file.exists(filePair.VerifiedPath) {
-		file.writeText(filePair.ReceivedPath, received)
+	utils.File.DeleteIfEmpty(filePair.VerifiedPath)
+	if !utils.File.Exists(filePair.VerifiedPath) {
+		utils.File.WriteText(filePair.ReceivedPath, received)
 		return EqualityResult{
 			Equality: FileNew,
 		}
 	}
 
 	verified := strings.Builder{}
-	verified.Write(file.readText(filePair.VerifiedPath))
+	verified.Write(utils.File.ReadText(filePair.VerifiedPath))
 
 	result := compareStrings(filePair.Extension, received, verified.String(), settings)
 	if result.IsEqual {
@@ -26,7 +29,7 @@ func (c *compare) Text(filePair FilePair, received string, settings *verifySetti
 		}
 	}
 
-	file.writeText(filePair.ReceivedPath, received)
+	utils.File.WriteText(filePair.ReceivedPath, received)
 	return EqualityResult{
 		Equality: FileNotEqual,
 		Message:  result.Message,

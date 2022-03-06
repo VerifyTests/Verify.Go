@@ -2,6 +2,7 @@ package verifier
 
 import (
 	"fmt"
+	"github.com/VerifyTests/Verify.Go/utils"
 	"io"
 	"strings"
 )
@@ -49,7 +50,7 @@ func (b *failingMessageBuilder) Build() string {
 	if len(b.delete) > 0 {
 		builder.WriteString("Delete:\n")
 		for _, f := range b.delete {
-			builder.WriteString(fmt.Sprintf("  - %s", file.getFileName(f)))
+			builder.WriteString(fmt.Sprintf("  - %s", utils.File.GetFileName(f)))
 		}
 	}
 
@@ -100,7 +101,7 @@ func (b *failingMessageBuilder) appendContent(builder *strings.Builder) {
 		builder.WriteString("New:\n\n")
 		for _, item := range newContentFiles {
 			builder.WriteString("Received: " + item.ReceivedName + "\n")
-			builder.Write(file.readText(item.ReceivedPath))
+			builder.Write(utils.File.ReadText(item.ReceivedPath))
 			builder.WriteString("\n")
 		}
 	}
@@ -110,10 +111,10 @@ func (b *failingMessageBuilder) appendContent(builder *strings.Builder) {
 		for _, item := range notEqualContentFiles {
 			if len(item.Message) == 0 {
 				builder.WriteString(fmt.Sprintf("Received: %s\n", item.File.ReceivedName))
-				builder.Write(file.readText(item.File.ReceivedPath))
+				builder.Write(utils.File.ReadText(item.File.ReceivedPath))
 				builder.WriteRune('\n')
 				builder.WriteString(fmt.Sprintf("Verified: %s\n", item.File.VerifiedName))
-				builder.Write(file.readText(item.File.VerifiedPath))
+				builder.Write(utils.File.ReadText(item.File.VerifiedPath))
 				builder.WriteRune('\n')
 			} else {
 				builder.WriteString(fmt.Sprintf("Received: %s\n", item.File.ReceivedName))

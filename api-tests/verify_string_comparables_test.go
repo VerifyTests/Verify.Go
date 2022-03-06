@@ -1,4 +1,4 @@
-package client
+package api_tests
 
 import (
 	"github.com/VerifyTests/Verify.Go/verifier"
@@ -39,7 +39,7 @@ func TestStringConversion(t *testing.T) {
 	}
 
 	settings := verifier.NewSettings()
-	settings.AutoVerify()
+	settings.UseDirectory("../_testdata")
 
 	for k, v := range testCases {
 
