@@ -1,4 +1,4 @@
-package Verify_Go
+package verify
 
 // Verify.Go is a snapshot tool for Go language that simplifies the assertion of complex data models and documents.
 //

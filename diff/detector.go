@@ -4,6 +4,7 @@ import (
 	"strings"
 )
 
+// CheckCI checks for Continuous Integration environment being present
 func CheckCI() CIDetected {
 	return checkCI(&systemEnvReader{})
 }

@@ -22,13 +22,20 @@ type EnvReader interface {
 type BuildServerEnvironment string
 
 const (
-	Appveyor    BuildServerEnvironment = "CI"
-	Jenkins     BuildServerEnvironment = "JENKINS_URL"
-	GitHub      BuildServerEnvironment = "GITHUB_ACTION"
+	//Appveyor build environment
+	Appveyor BuildServerEnvironment = "CI"
+	//Jenkins build environment
+	Jenkins BuildServerEnvironment = "JENKINS_URL"
+	//GitHub actions build environment
+	GitHub BuildServerEnvironment = "GITHUB_ACTION"
+	//AzureDevOps build environment
 	AzureDevOps BuildServerEnvironment = "AGENT_ID"
-	TeamCity    BuildServerEnvironment = "TEAMCITY_VERSION"
-	MyGet       BuildServerEnvironment = "BuildRunner"
-	GitLab      BuildServerEnvironment = "GITLAB_CI"
+	//TeamCity build environment
+	TeamCity BuildServerEnvironment = "TEAMCITY_VERSION"
+	//MyGet build environment
+	MyGet BuildServerEnvironment = "BuildRunner"
+	//GitLab build environment
+	GitLab BuildServerEnvironment = "GITLAB_CI"
 )
 
 // LaunchResult result of the launch operation of the diff tool
@@ -55,44 +62,71 @@ const (
 type ToolKind string
 
 const (
-	None             ToolKind = ""
-	BeyondCompare    ToolKind = "BeyondCompare"
-	P4MergeText      ToolKind = "P4MergeText"
-	P4MergeImage     ToolKind = "P4MergeImage"
-	AraxisMerge      ToolKind = "AraxisMerge"
-	Meld             ToolKind = "Meld"
-	SublimeMerge     ToolKind = "SublimeMerge"
-	Kaleidoscope     ToolKind = "Kaleidoscope"
-	CodeCompare      ToolKind = "CodeCompare"
-	DeltaWalker      ToolKind = "DeltaWalker"
-	WinMerge         ToolKind = "WinMerge"
-	DiffMerge        ToolKind = "DiffMerge"
-	TortoiseMerge    ToolKind = "TortoiseMerge"
+	//None no tool
+	None ToolKind = ""
+	//BeyondCompare diff tool
+	BeyondCompare ToolKind = "BeyondCompare"
+	//P4MergeText diff tool
+	P4MergeText ToolKind = "P4MergeText"
+	//P4MergeImage diff tool
+	P4MergeImage ToolKind = "P4MergeImage"
+	//AraxisMerge diff tool
+	AraxisMerge ToolKind = "AraxisMerge"
+	//Meld diff tool
+	Meld ToolKind = "Meld"
+	//SublimeMerge diff tool
+	SublimeMerge ToolKind = "SublimeMerge"
+	//Kaleidoscope diff tool
+	Kaleidoscope ToolKind = "Kaleidoscope"
+	//CodeCompare diff tool
+	CodeCompare ToolKind = "CodeCompare"
+	//DeltaWalker diff tool
+	DeltaWalker ToolKind = "DeltaWalker"
+	//WinMerge diff tool
+	WinMerge ToolKind = "WinMerge"
+	//DiffMerge diff tool
+	DiffMerge ToolKind = "DiffMerge"
+	//TortoiseMerge diff tool
+	TortoiseMerge ToolKind = "TortoiseMerge"
+	//TortoiseGitMerge diff tool
 	TortoiseGitMerge ToolKind = "TortoiseGitMerge"
-	TortoiseIDiff    ToolKind = "TortoiseIDiff"
-	KDiff3           ToolKind = "KDiff3"
-	TkDiff           ToolKind = "TkDiff"
-	Guiffy           ToolKind = "Guiffy"
-	ExamDiff         ToolKind = "ExamDiff"
-	Diffinity        ToolKind = "Diffinity"
+	//TortoiseIDiff diff tool
+	TortoiseIDiff ToolKind = "TortoiseIDiff"
+	//KDiff3 diff tool
+	KDiff3 ToolKind = "KDiff3"
+	//TkDiff diff tool
+	TkDiff ToolKind = "TkDiff"
+	//Guiffy diff tool
+	Guiffy ToolKind = "Guiffy"
+	//ExamDiff diff tool
+	ExamDiff ToolKind = "ExamDiff"
+	//Diffinity diff tool
+	Diffinity ToolKind = "Diffinity"
+	//VisualStudioCode diff tool
 	VisualStudioCode ToolKind = "VisualStudioCode"
-	GoLand           ToolKind = "GoLand"
-	Vim              ToolKind = "Vim"
-	Neovim           ToolKind = "Neovim"
+	//GoLand diff tool
+	GoLand ToolKind = "GoLand"
+	//Vim diff tool
+	Vim ToolKind = "Vim"
+	//Neovim diff tool
+	Neovim ToolKind = "Neovim"
 )
 
 //PriceModel of the detected diff tool
 type PriceModel string
 
 const (
-	Paid     PriceModel = "Paid"
-	Free     PriceModel = "Free"
+	//Paid diff tool
+	Paid PriceModel = "Paid"
+	//Free diff tool
+	Free PriceModel = "Free"
+	//Donation free with donation options
 	Donation PriceModel = "Free with option to donate"
-	Sponsor  PriceModel = "Free with option to sponsor"
+	//Sponsor free with ability to sponsor
+	Sponsor PriceModel = "Free with option to sponsor"
 )
 
-//AllTools list of all supported diff tools
-var AllTools = []ToolKind{
+var allTools = []ToolKind{
 	BeyondCompare,
 	P4MergeText,
 	P4MergeImage,

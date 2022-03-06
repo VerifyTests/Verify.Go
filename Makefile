@@ -31,12 +31,15 @@ diff-integration-test:
 	go build -tags=integration ./diff
 	go test -v ./diff -tags=integration
 	
+utils-test:
+	echo "Running unit tests for 'utils'..."
+	go test -v ./utils
 
 verifier-all: verifier-build verifier-vet verifier-test
 diff-all: diff-build diff-vet diff-test
 
 build-all: diff-build verifier-build
 vet-all: diff-vet verifier-vet
-unit-test-all: diff-test verifier-test
+unit-test-all: utils-test diff-test verifier-test
 
 all: build-all vet-all unit-test-all

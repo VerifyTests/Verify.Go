@@ -12,7 +12,7 @@ import (
 
 func TestFindingProcessByName_Integration(t *testing.T) {
 	env := newTestReader()
-	env.lookup[env_diffengine_disabled] = "false"
+	env.lookup[envDiffEngineDisabled] = "false"
 
 	temp := filepath.Join("../_testdata", "temp.txt")
 	tempPath, _ := filepath.Abs(temp)

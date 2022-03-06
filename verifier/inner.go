@@ -156,7 +156,29 @@ func (v *innerVerifier) tryGetTargetBuilder(target interface{}) (builder *string
 
 func (v *innerVerifier) tryGetToString(target interface{}) (asStringResult, bool) {
 	//TODO: implement SimpleName like conversion
+	result, converted := v.tryGetPrimitiveToString(target)
+	if converted {
+		return result, true
+	}
+
 	typ := reflect2.TypeOf(target)
+	
+	if typ.AssignableTo(stringBuilderType) {
+		return stringBuilderToString(target.(strings.Builder))
+	}
+
+	if typ.Implements(stringerType) {
+		return stringerToString(target.(fmt.Stringer)), true
+	}
+
+	if typ.Implements(textMarshalerType) {
+		return textMarshallerToString(target.(encoding.TextMarshaler))
+	}
+
+	return asStringResult{}, false
+}
+
+func (v *innerVerifier) tryGetPrimitiveToString(target interface{}) (asStringResult, bool) {
 	switch v := target.(type) {
 	case string:
 		return stringToString(v), true
@@ -190,18 +212,6 @@ func (v *innerVerifier) tryGetToString(target interface{}) (asStringResult, bool
 		return timeToString(v), true
 	case uuid.UUID:
 		return uUIDToString(v), true
-	}
-
-	if typ.AssignableTo(stringBuilderType) {
-		return stringBuilderToString(target.(strings.Builder))
-	}
-
-	if typ.Implements(stringerType) {
-		return stringerToString(target.(fmt.Stringer)), true
-	}
-
-	if typ.Implements(textMarshalerType) {
-		return textMarshallerToString(target.(encoding.TextMarshaler))
 	}
 
 	return asStringResult{}, false
