@@ -1,6 +1,7 @@
 package diff
 
 import (
+	"github.com/VerifyTests/Verify.Go/utils"
 	"os"
 	"strings"
 )
@@ -37,7 +38,7 @@ func Kill(tempFile, targetFile string) {
 		return
 	}
 
-	extension := file.getFileExtension(tempFile)
+	extension := utils.File.GetFileExtension(tempFile)
 	diffTool, found := runner.tool.tryFindForExtension(extension)
 	if !found {
 		runner.logger.Info("Extension not found. %s", extension)
@@ -79,7 +80,7 @@ func (r *runner) Launch(tempFile, targetFile string) LaunchResult {
 	guardFiles(tempFile, targetFile)
 
 	finder := func() (resolved *ResolvedTool, found bool) {
-		extension := file.getFileExtension(tempFile)
+		extension := utils.File.GetFileExtension(tempFile)
 		return r.tool.tryFindForExtension(extension)
 	}
 
@@ -150,9 +151,9 @@ func (r *runner) ShouldExitLaunch(tryResolveTool TryResolveTool, targetFile stri
 }
 
 func (r *runner) tryCreate(tool *ResolvedTool, targetFile string) bool {
-	targetExists := file.exists(targetFile)
+	targetExists := utils.File.Exists(targetFile)
 	if tool.RequiresTarget && !targetExists {
-		if !file.tryCreateFile(targetFile, true) {
+		if !utils.File.TryCreateFile(targetFile, true) {
 			return false
 		}
 	}
@@ -174,6 +175,6 @@ func (r *runner) LaunchProcess(tool *ResolvedTool, arguments []string) int32 {
 }
 
 func guardFiles(tempFile, targetFile string) {
-	guard.FileExists(tempFile)
-	guard.AgainstEmpty(targetFile)
+	utils.Guard.FileExists(tempFile)
+	utils.Guard.AgainstEmpty(targetFile)
 }

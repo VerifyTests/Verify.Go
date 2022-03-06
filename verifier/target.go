@@ -1,6 +1,7 @@
 package verifier
 
 import (
+	"github.com/VerifyTests/Verify.Go/utils"
 	"strings"
 )
 
@@ -15,8 +16,8 @@ type Target struct {
 }
 
 func newStringTarget(extension string, stringData string) *Target {
-	guard.AgainstBadExtension(extension)
-	if !file.isText(extension) {
+	utils.Guard.AgainstBadExtension(extension)
+	if !utils.File.IsText(extension) {
 		panic("Dont pass a text for a binary extension. Instead use `newStreamTarget`")
 	}
 
@@ -28,8 +29,8 @@ func newStringTarget(extension string, stringData string) *Target {
 }
 
 func newStringBuilderTarget(extension string, stringBuilderData *strings.Builder) *Target {
-	guard.AgainstBadExtension(extension)
-	if !file.isText(extension) {
+	utils.Guard.AgainstBadExtension(extension)
+	if !utils.File.IsText(extension) {
 		panic("Dont pass a text for a binary extension. Instead use `newStreamTarget`")
 	}
 
@@ -41,8 +42,8 @@ func newStringBuilderTarget(extension string, stringBuilderData *strings.Builder
 }
 
 func newStreamTarget(extension string, stream []byte) *Target {
-	guard.AgainstBadExtension(extension)
-	if file.isText(extension) {
+	utils.Guard.AgainstBadExtension(extension)
+	if utils.File.IsText(extension) {
 		panic("Dont pass a byte slice for text. Instead use `newStringTarget` or `newStringBuilderTarget`")
 	}
 

@@ -3,6 +3,7 @@ package verifier
 import (
 	"encoding"
 	"fmt"
+	"github.com/VerifyTests/Verify.Go/utils"
 	"github.com/google/uuid"
 	"github.com/modern-go/reflect2"
 	"log"
@@ -49,10 +50,10 @@ func newInnerVerifier(t testingT, settings *verifySettings) *innerVerifier {
 		directory = sourceFileDirectory
 	} else {
 		directory = path.Join(directory, sourceFileDirectory)
-		if _, err := os.Stat(directory); os.IsNotExist(err) {
-			e := os.Mkdir(directory, 0755)
-			if e != nil {
-				log.Fatalf("Failed to delete %s", file)
+		if !utils.File.Exists(directory) {
+			err := utils.File.CreateDirectory(directory)
+			if err != nil {
+				log.Fatalf("Failed to delete %s", directory)
 			}
 		}
 	}
@@ -75,7 +76,7 @@ func newInnerVerifier(t testingT, settings *verifySettings) *innerVerifier {
 	}
 
 	for _, f := range verifier.receivedFiles {
-		file.delete(f)
+		utils.File.Delete(f)
 	}
 
 	settings.runBeforeVerify()
@@ -208,7 +209,7 @@ func (v *innerVerifier) TryGetToString(target interface{}) (asStringResult, bool
 func defaultFileConvention(settings *verifySettings, uniqueness string) (string, string) {
 	testName, sourceFile, _ := testCallerInfo()
 	name := getTestCaseName(testName, settings.testCase)
-	sourceFileWithoutExt := file.getFileNameWithoutExtension(sourceFile)
+	sourceFileWithoutExt := utils.File.GetFileNameWithoutExtension(sourceFile)
 
 	if len(settings.directory) == 0 {
 		settings.directory = filepath.Dir(sourceFile)
@@ -339,7 +340,7 @@ func fileMatch(root, pattern string) ([]string, error) {
 func findMatchingFiles(files []string, fileNamePrefix string, suffix string) []string {
 	matches := make([]string, 0)
 	for _, f := range files {
-		name := file.getFileNameWithoutExtension(f)
+		name := utils.File.GetFileNameWithoutExtension(f)
 		if !strings.HasPrefix(name, fileNamePrefix) {
 			continue
 		}

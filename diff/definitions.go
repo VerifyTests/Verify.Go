@@ -1,5 +1,7 @@
 package diff
 
+import "github.com/VerifyTests/Verify.Go/utils"
+
 type ToolDefinition struct {
 	Kind             ToolKind
 	Url              string
@@ -345,14 +347,14 @@ func defineDiffMerge() *ToolDefinition {
 
 func defineExamDiff() *ToolDefinition {
 	leftArgs := func(temp, target string) []string {
-		tempTitle := file.getFileName(temp)
-		targetTitle := file.getFileName(target)
+		tempTitle := utils.File.GetFileName(temp)
+		targetTitle := utils.File.GetFileName(target)
 		return []string{target, temp, "/nh", "/diffonly", "/dn1:" + targetTitle, "/dn2:" + tempTitle}
 	}
 
 	rightArgs := func(temp, target string) []string {
-		tempTitle := file.getFileName(temp)
-		targetTitle := file.getFileName(target)
+		tempTitle := utils.File.GetFileName(temp)
+		targetTitle := utils.File.GetFileName(target)
 		return []string{temp, target, "/nh", "/diffonly", "/dn1:" + tempTitle, "/dn2:" + targetTitle}
 	}
 

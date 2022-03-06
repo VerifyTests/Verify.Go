@@ -2,6 +2,7 @@ package verifier
 
 import (
 	"github.com/VerifyTests/Verify.Go/diff"
+	"github.com/VerifyTests/Verify.Go/utils"
 	"strings"
 )
 
@@ -143,7 +144,7 @@ func (e *engine) processDelete(deletedFile string) {
 	e.settings.runOnVerifyDelete(deletedFile)
 
 	if e.settings.autoVerify {
-		file.delete(deletedFile)
+		utils.File.Delete(deletedFile)
 		return
 	}
 
@@ -220,6 +221,6 @@ func (e *engine) runDiffAutoCheck(item FilePair) {
 }
 
 func (e *engine) acceptChanges(item FilePair) {
-	file.delete(item.VerifiedPath)
-	file.move(item.ReceivedPath, item.VerifiedPath)
+	utils.File.Delete(item.VerifiedPath)
+	utils.File.Move(item.ReceivedPath, item.VerifiedPath)
 }

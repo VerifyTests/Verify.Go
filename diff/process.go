@@ -2,6 +2,7 @@ package diff
 
 import (
 	"bytes"
+	"github.com/VerifyTests/Verify.Go/utils"
 	"github.com/shirou/gopsutil/v3/process"
 	"os/exec"
 	"runtime"
@@ -76,7 +77,7 @@ func (p *processCleaner) findAllProcess() []*processCommand {
 }
 
 func (p *processCleaner) GetProcessInfo(command string) (proc *processCommand, found bool) {
-	guard.AgainstEmpty(command)
+	utils.Guard.AgainstEmpty(command)
 	if runtime.GOOS != "windows" {
 		command = p.TrimCommand(command)
 	}
@@ -143,7 +144,7 @@ func (p *processCleaner) RunCommand(ch chan<- runResult, name string, arg ...str
 }
 
 func (p *processCleaner) Kill(command string) {
-	guard.AgainstEmpty(command)
+	utils.Guard.AgainstEmpty(command)
 
 	if runtime.GOOS != "windows" {
 		command = p.TrimCommand(command)
