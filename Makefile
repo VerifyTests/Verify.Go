@@ -34,4 +34,9 @@ diff-integration-test:
 
 verifier-all: verifier-build verifier-vet verifier-test
 diff-all: diff-build diff-vet diff-test
-all: diff-all verifier-all
+
+build-all: diff-build verifier-build
+vet-all: diff-vet verifier-vet
+unit-test-all: diff-test verifier-test
+
+all: build-all vet-all unit-test-all

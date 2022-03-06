@@ -21,7 +21,9 @@ jobs:
       uses: actions/setup-go@v2
       with:
         go-version: ${{ matrix.go_version }}
-    - name: Build Diff
-      run: make diff-all
-    - name: Build Verifier
-      run: make verifier-all
+    - name: Build
+      run: make build-all
+    - name: Vet
+      run: make vet-all
+    - name: Test
+      run: make unit-test-all

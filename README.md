@@ -1,6 +1,6 @@
 # <img src='./icon.png' height='30px'> Verify
 
-[![Discussions](https://img.shields.io/badge/Verify-Discussions-yellow?svg=true&label=)](https://github.com/VerifyTests/Discussions/discussions) [![Build status](https://github.com/VerifyTests/Verify.Go/actions/workflows/build-pipeline.yml/badge.svg)](https://github.com/VerifyTests/Verify.Go/actions/workflows/build.yml)
+[![Discussions](https://img.shields.io/badge/Verify-Discussions-yellow?svg=true&label=)](https://github.com/VerifyTests/Discussions/discussions) [![Build status](https://github.com/VerifyTests/Verify.Go/actions/workflows/build.yml/badge.svg)](https://github.com/VerifyTests/Verify.Go/actions/workflows/build.yml)
 
 Verify.Go is a snapshot tool for Go language that simplifies the assertion of complex data models and documents.
 
