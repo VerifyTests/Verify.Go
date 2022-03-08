@@ -52,15 +52,15 @@ func addTempDirectory(value string) {
 }
 
 func addDirectory(value string) {
-	if !strings.HasSuffix(value, dirSeparator) {
-		add(currentDirectoryReplacements, value+dirSeparator)
+	if strings.HasSuffix(value, dirSeparator) {
+		add(currentDirectoryReplacements, value[0:len(value)-1])
 	} else {
 		add(currentDirectoryReplacements, value)
 	}
 }
 
 func add(m map[string]struct{}, value string) {
-	if _, ok := m[value]; ok {
+	if _, exists := m[value]; !exists {
 		m[value] = struct{}{}
 	}
 }
