@@ -11,8 +11,8 @@ import (
 	"time"
 )
 
-var currentDirectoryReplacements map[string]struct{}
-var tempDirectoryReplacements map[string]struct{}
+var currentDirectoryReplacements = make(map[string]struct{})
+var tempDirectoryReplacements = make(map[string]struct{})
 var dirSeparator = string(os.PathSeparator)
 var guidPattern = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
 var reg = regexp.MustCompile(guidPattern)
