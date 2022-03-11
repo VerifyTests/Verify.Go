@@ -4,9 +4,30 @@ import (
 	"strings"
 )
 
+const (
+	envDiffEngineDisabled = "DiffEngine_Disabled"
+)
+
 // CheckCI checks for Continuous Integration environment being present
 func CheckCI() CIDetected {
 	return checkCI(&systemEnvReader{})
+}
+
+func CheckDisabled() bool {
+	return checkDisabled(&systemEnvReader{})
+}
+
+func checkDisabled(reader EnvReader) bool {
+	variable, found := reader.LookupEnv(envDiffEngineDisabled)
+	if !found {
+		variable = ""
+	}
+
+	if strings.ToLower(variable) == "true" || checkCI(reader) {
+		return true
+	}
+
+	return false
 }
 
 func checkCI(reader EnvReader) CIDetected {

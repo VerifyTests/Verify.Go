@@ -28,6 +28,7 @@ func TestFinderMultiMatchDirReverseOrder(t *testing.T) {
 	createTestDir(t, "../_testdata/DirForSearch/dir2", time.Now())
 
 	var path = filepath.Join("../_testdata/DirForSearch", "*", "TextFile1.txt")
+
 	var finder = newFinder()
 
 	result, found := finder.TryFind(path)

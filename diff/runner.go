@@ -7,7 +7,6 @@ import (
 )
 
 type runner struct {
-	Disabled   bool
 	directory  string
 	ciDetected CIDetected
 	finder     *diffFinder
@@ -15,11 +14,8 @@ type runner struct {
 	counter    *instanceCounter
 	proc       *processCleaner
 	logger     Logger
+	disabled   bool
 }
-
-const (
-	envDiffEngineDisabled = "DiffEngine_Disabled"
-)
 
 type systemEnvReader struct{}
 
@@ -36,10 +32,13 @@ func Launch(tempFile, targetFile string) LaunchResult {
 // Kill the diff tool if it doesn't support MDI, is already running and has been
 // opened to display a specific temp and target file.
 func Kill(tempFile, targetFile string) {
-	runner := newRunner(&systemEnvReader{})
-	if runner.Disabled {
+	envReader := &systemEnvReader{}
+
+	if checkDisabled(envReader) {
 		return
 	}
+
+	runner := newRunner(envReader)
 
 	extension := utils.File.GetFileExtension(tempFile)
 	diffTool, found := runner.tool.tryFindForExtension(extension)
@@ -59,21 +58,13 @@ func Kill(tempFile, targetFile string) {
 
 func newRunner(reader EnvReader) *runner {
 	runner := &runner{
+		disabled:   checkDisabled(reader),
 		ciDetected: checkCI(reader),
 		finder:     newFinder(),
 		tool:       newTools(),
 		counter:    newInstanceCounter(reader),
 		proc:       newProcessCleaner(),
 		logger:     newLogger("runner"),
-	}
-
-	variable, found := reader.LookupEnv(envDiffEngineDisabled)
-	if !found {
-		variable = ""
-	}
-
-	if strings.ToLower(variable) == "true" || runner.ciDetected {
-		runner.Disabled = true
 	}
 
 	return runner
@@ -141,7 +132,7 @@ func (r *runner) KillIfMdi(tool *ResolvedTool, command string) {
 
 // ShouldExitLaunch checks if the launched diff tool should be exitted
 func (r *runner) ShouldExitLaunch(tryResolveTool TryResolveTool, targetFile string) (tool *ResolvedTool, result LaunchResult, exited bool) {
-	if r.Disabled {
+	if r.disabled {
 		return nil, Disabled, true
 	}
 

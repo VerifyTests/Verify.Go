@@ -178,7 +178,7 @@ func (e *engine) processNotEquals() {
 }
 
 func (e *engine) processEquals() {
-	if !e.settings.diffEnabled {
+	if !e.settings.diffDisabled {
 		return
 	}
 
@@ -215,7 +215,7 @@ func (e *engine) runDiffAutoCheck(item FilePair) {
 		return
 	}
 
-	if e.settings.diffEnabled {
+	if e.settings.diffDisabled {
 		diff.Launch(item.ReceivedPath, item.VerifiedPath)
 	}
 }

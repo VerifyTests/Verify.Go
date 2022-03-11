@@ -9,7 +9,7 @@ import (
 type verifySettings struct {
 	directory                        string
 	autoVerify                       bool
-	diffEnabled                      bool
+	diffDisabled                     bool
 	strictJSON                       bool
 	scrubGuids                       bool
 	scrubTimes                       bool
@@ -42,7 +42,7 @@ type verifySettings struct {
 // VerifySettings provides customization for the Verify process.
 type VerifySettings interface {
 	AutoVerify()
-	EnableDiff()
+	DisableDiff()
 	UseStrictJSON()
 	DontScrubGuids()
 	DontScrubTimes()
@@ -121,9 +121,9 @@ func (v *verifySettings) OmitContentFromError() {
 	v.omitContentFromError = true
 }
 
-// EnableDiff enables the diff tools
-func (v *verifySettings) EnableDiff() {
-	v.diffEnabled = true
+// DisableDiff enables the diff tools
+func (v *verifySettings) DisableDiff() {
+	v.diffDisabled = false
 }
 
 // UseStrictJSON use .json extension for the outputted files
@@ -326,7 +326,7 @@ func newSettings() *verifySettings {
 		stringComparers:                  make(map[string]StringComparerFunc),
 		scrubber:                         newDataScrubber(startCounter()),
 		ciDetected:                       diff.CheckCI(),
-		diffEnabled:                      false,
+		diffDisabled:                     diff.CheckDisabled(),
 		autoVerify:                       false,
 	}
 }
