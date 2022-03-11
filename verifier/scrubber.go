@@ -11,8 +11,12 @@ import (
 	"time"
 )
 
-var currentDirectoryReplacements = make(map[string]struct{})
-var tempDirectoryReplacements = make(map[string]struct{})
+type dirReplacement struct {
+	Directory string
+	Mask      string
+}
+
+var directoryReplacements = make([]dirReplacement, 0)
 var dirSeparator = string(os.PathSeparator)
 var guidPattern = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
 var reg = regexp.MustCompile(guidPattern)
@@ -28,41 +32,28 @@ func newDataScrubber(counter *countHolder) *dataScrubber {
 }
 
 func init() {
-	if home, err := os.UserHomeDir(); err == nil {
-		addDirectory(home)
+	if cur, err := os.Getwd(); err == nil {
+		addDirectory(dirReplacement{cur, "{CurrentDirectory}"})
 	}
 	if config, err := os.UserConfigDir(); err == nil {
-		addDirectory(config)
+		addDirectory(dirReplacement{config, "{ConfigDir}"})
 	}
 	if cache, err := os.UserCacheDir(); err == nil {
-		addDirectory(cache)
+		addDirectory(dirReplacement{cache, "{CacheDir}"})
 	}
 	if exe, err := os.Executable(); err == nil {
-		addDirectory(exe)
-	}
-	if cur, err := os.Getwd(); err == nil {
-		addDirectory(cur)
+		addDirectory(dirReplacement{exe, "{ExeDir}"})
 	}
 
-	addTempDirectory(os.TempDir())
-}
+	addDirectory(dirReplacement{os.TempDir(), "{TempDir}"})
 
-func addTempDirectory(value string) {
-	add(tempDirectoryReplacements, value)
-}
-
-func addDirectory(value string) {
-	if strings.HasSuffix(value, dirSeparator) {
-		add(currentDirectoryReplacements, value[0:len(value)-1])
-	} else {
-		add(currentDirectoryReplacements, value)
+	if home, err := os.UserHomeDir(); err == nil {
+		addDirectory(dirReplacement{home, "{HomeDir}"})
 	}
 }
 
-func add(m map[string]struct{}, value string) {
-	if _, exists := m[value]; !exists {
-		m[value] = struct{}{}
-	}
+func addDirectory(replacement dirReplacement) {
+	directoryReplacements = append(directoryReplacements, replacement)
 }
 
 // Apply applies all the registered scrubbers to the target
@@ -70,12 +61,8 @@ func (s *dataScrubber) Apply(extension string, target *strings.Builder, settings
 	stringData := target.String()
 	target.Reset()
 
-	for replace := range currentDirectoryReplacements {
-		stringData = strings.ReplaceAll(stringData, replace, "{CurrentDirectory}")
-	}
-
-	for replace := range tempDirectoryReplacements {
-		stringData = strings.ReplaceAll(stringData, replace, "{TempPath}")
+	for _, replacement := range directoryReplacements {
+		stringData = strings.ReplaceAll(stringData, replacement.Directory, replacement.Mask)
 	}
 
 	for _, scrubber := range settings.instanceScrubbers {

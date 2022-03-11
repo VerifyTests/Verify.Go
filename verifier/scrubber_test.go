@@ -77,15 +77,20 @@ func TestScrubber_ScrubMachineName(t *testing.T) {
 
 func TestScrubber_CurrentDirectory(t *testing.T) {
 	wd, _ := os.Getwd()
+	exe, _ := os.Executable()
+	tmp := os.TempDir()
+	cache, _ := os.UserCacheDir()
+
 	builder := strings.Builder{}
-	builder.WriteString(wd)
+
+	builder.WriteString(fmt.Sprintf("%s\n%s\n%s\n%s", exe, wd, tmp, cache))
 
 	scrubber := newDataScrubber(startCounter())
 
 	scrubber.Apply("txt", &builder, newSettings())
 
 	output := builder.String()
-	assert.Equal(t, "{CurrentDirectory}", output)
+	assert.Equal(t, "{ExeDir}\n{CurrentDirectory}\n{TempDir}\n{CacheDir}", output)
 }
 
 func TestScrubber_FilterLinesWithLineEnd(t *testing.T) {
