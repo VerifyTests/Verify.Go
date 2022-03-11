@@ -11,8 +11,8 @@ import (
 	"time"
 )
 
-var currentDirectoryReplacements map[string]struct{}
-var tempDirectoryReplacements map[string]struct{}
+var currentDirectoryReplacements = make(map[string]struct{})
+var tempDirectoryReplacements = make(map[string]struct{})
 var dirSeparator = string(os.PathSeparator)
 var guidPattern = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
 var reg = regexp.MustCompile(guidPattern)
@@ -52,15 +52,15 @@ func addTempDirectory(value string) {
 }
 
 func addDirectory(value string) {
-	if !strings.HasSuffix(value, dirSeparator) {
-		add(currentDirectoryReplacements, value+dirSeparator)
+	if strings.HasSuffix(value, dirSeparator) {
+		add(currentDirectoryReplacements, value[0:len(value)-1])
 	} else {
 		add(currentDirectoryReplacements, value)
 	}
 }
 
 func add(m map[string]struct{}, value string) {
-	if _, ok := m[value]; ok {
+	if _, exists := m[value]; !exists {
 		m[value] = struct{}{}
 	}
 }

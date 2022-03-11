@@ -75,6 +75,19 @@ func TestScrubber_ScrubMachineName(t *testing.T) {
 	assert.NotContains(t, scrubbed, host)
 }
 
+func TestScrubber_CurrentDirectory(t *testing.T) {
+	wd, _ := os.Getwd()
+	builder := strings.Builder{}
+	builder.WriteString(wd)
+
+	scrubber := newDataScrubber(startCounter())
+
+	scrubber.Apply("txt", &builder, newSettings())
+
+	output := builder.String()
+	assert.Equal(t, "{CurrentDirectory}", output)
+}
+
 func TestScrubber_FilterLinesWithLineEnd(t *testing.T) {
 
 	builder := strings.Builder{}
