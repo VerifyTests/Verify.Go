@@ -1,0 +1,15 @@
+project_name: Verify
+builds:
+  - skip: true
+
+release:
+  github:
+  prerelease: auto
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^docs:'
+    - '^test:'
+
