@@ -54,7 +54,7 @@ func TestVerifyingNilObject(t *testing.T) {
 
 func TestSimpleString(t *testing.T) {
 	settings := NewTestSettings()
-	settings.EnableDiff()
+	settings.DisableDiff()
 	verifier.VerifyWithSetting(t, settings, "Foo")
 }
 

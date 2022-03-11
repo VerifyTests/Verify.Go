@@ -53,7 +53,11 @@ func TestRunner(t *testing.T) {
 	for _, row := range table {
 		reader := e(row.key, row.value)
 		runner := newRunner(&reader)
+		runner.logger.EnableLogging()
 
-		assert.Equal(t, row.expected, runner.Disabled)
+		check := checkDisabled(&reader)
+
+		assert.Equal(t, row.expected, runner.disabled)
+		assert.Equal(t, row.expected, check)
 	}
 }
