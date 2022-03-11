@@ -4,6 +4,8 @@ on:
   push:
     branches:
     - main
+    tags:
+      - 'v*'
   pull_request:
     branches:
     - main
@@ -27,3 +29,11 @@ jobs:
       run: make vet-all
     - name: Test
       run: make unit-test-all
+    - name: Release
+      uses: goreleaser/goreleaser-action@v2
+      if: success() && startsWith(github.ref, 'refs/tags/')
+      with:
+        version: latest
+        args: release --rm-dist
+      env:
+        GITHUB_TOKEN: ${{ secrets.ReleaseToken }}
