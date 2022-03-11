@@ -10,6 +10,14 @@ Verify.Go is a snapshot tool for Go language that simplifies the assertion of co
 
 Verify is called on the test result during the assertion phase. It serializes that result and stores it in a file that matches the test name. On the next test execution, the result is again serialized and compared to the existing file. The test will fail if the two snapshots do not match: either the change is unexpected, or the reference snapshot needs to be updated to the new result.
 
+## Installation
+
+To install, add the library directly to your Go project.
+
+```cmd
+go get github.com/VerifyTests/Verify.Go
+```
+
 ## Snapshot management
 
 Accepting or declining a snapshot file is part of the core workflow of Verify. There are several ways to do this and the approach(s) selected is a personal preference.
