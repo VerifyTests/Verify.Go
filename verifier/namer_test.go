@@ -1,7 +1,6 @@
 package verifier
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -40,7 +39,9 @@ func TestNamerUniqueness(t *testing.T) {
 			namer := newNamer(setting)
 			result := namer.getUniqueness()
 			t.Logf(result)
-			assert.NotEmpty(t, result)
+			if len(result) == 0 {
+				t.Fatalf("Should have created a name")
+			}
 		})
 	}
 }

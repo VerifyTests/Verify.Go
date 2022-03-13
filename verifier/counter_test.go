@@ -2,7 +2,6 @@ package verifier
 
 import (
 	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
 	"sync"
 	"testing"
 	"time"
@@ -13,13 +12,19 @@ func TestGetNextTime(t *testing.T) {
 
 	current := time.Now()
 	first := count.GetNextTime(current)
-	assert.Equal(t, 1, first)
+	if first != 1 {
+		t.Fatalf("Should generate correct time")
+	}
 
 	repeat := count.GetNextTime(current) // Same
-	assert.Equal(t, 1, repeat)
+	if repeat != 1 {
+		t.Fatalf("Should generate correct time")
+	}
 
 	second := count.GetNextTime(time.Now())
-	assert.Equal(t, 2, second)
+	if second != 2 {
+		t.Fatalf("Should generate correct time")
+	}
 }
 
 func TestGetNextUUID(t *testing.T) {
@@ -29,13 +34,19 @@ func TestGetNextUUID(t *testing.T) {
 	guid2, _ := uuid.NewUUID()
 
 	first := counter.GetNextUUID(guid1)
-	assert.Equal(t, 1, first)
+	if first != 1 {
+		t.Fatalf("Should generate correct guid")
+	}
 
 	repeat := counter.GetNextUUID(guid1) // Same value
-	assert.Equal(t, 1, repeat)
+	if repeat != 1 {
+		t.Fatalf("Should generate correct guid")
+	}
 
 	second := counter.GetNextUUID(guid2)
-	assert.Equal(t, 2, second)
+	if second != 2 {
+		t.Fatalf("Should generate correct guid")
+	}
 }
 
 func TestConcurrentNext(t *testing.T) {
@@ -53,5 +64,7 @@ func TestConcurrentNext(t *testing.T) {
 	}
 	wg.Wait()
 
-	assert.Equal(t, 1001, counter.GetNextID(1001))
+	if counter.GetNextID(1001) != 1001 {
+		t.Fatalf("Should generate correct id")
+	}
 }

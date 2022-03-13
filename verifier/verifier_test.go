@@ -2,7 +2,6 @@ package verifier_test
 
 import (
 	"github.com/VerifyTests/Verify.Go/verifier"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"strings"
 	"testing"
@@ -58,9 +57,17 @@ func TestCallbacks(t *testing.T) {
 
 	verifier.VerifyWithSetting(t, settings, Test{})
 
-	assert.True(t, firstCalled)
-	assert.True(t, beforeCalled)
-	assert.True(t, afterCalled)
+	if !firstCalled {
+		t.Fatalf("OnFirstVerify was not called")
+	}
+
+	if !beforeCalled {
+		t.Fatalf("OnBeforeVerify was not called")
+	}
+
+	if !afterCalled {
+		t.Fatalf("OnAfterVerify was not called")
+	}
 }
 
 func TestRegisteringScrubberWithExtension(t *testing.T) {

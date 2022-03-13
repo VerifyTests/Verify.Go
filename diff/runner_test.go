@@ -1,7 +1,6 @@
 package diff
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -57,7 +56,11 @@ func TestRunner(t *testing.T) {
 
 		check := checkDisabled(&reader)
 
-		assert.Equal(t, row.expected, runner.disabled)
-		assert.Equal(t, row.expected, check)
+		if row.expected != runner.disabled {
+			t.Fatalf("failed to get expected disabled status")
+		}
+		if row.expected != check {
+			t.Fatalf("failed to get correct check status")
+		}
 	}
 }

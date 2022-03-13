@@ -1,7 +1,6 @@
 package verifier
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -14,8 +13,9 @@ func TestVerifySettings_AddScrubber(t *testing.T) {
 	s := newSettings()
 	s.AddScrubber(testScrubber)
 
-	assert.NotEmpty(t, s.instanceScrubbers)
-	assert.Equal(t, 1, len(s.instanceScrubbers))
+	if len(s.instanceScrubbers) != 1 {
+		t.Fatalf("InstanceScrubbers should have 1 item")
+	}
 }
 
 func TestVerifySettings_AddScrubberForExtension(t *testing.T) {
@@ -26,16 +26,25 @@ func TestVerifySettings_AddScrubberForExtension(t *testing.T) {
 
 	s := newSettings()
 
-	assert.NotNil(t, s.extensionMappedInstanceScrubbers)
-	assert.Len(t, s.extensionMappedInstanceScrubbers, 0)
+	if len(s.extensionMappedInstanceScrubbers) != 0 {
+		t.Fatalf("mapped instance scrubbers should be empty")
+	}
 
 	s.AddScrubberForExtension("txt", firstTextScrubber)
-	assert.Len(t, s.extensionMappedInstanceScrubbers["txt"], 1)
+	if len(s.extensionMappedInstanceScrubbers["txt"]) != 1 {
+		t.Fatalf("extension scrubber for 'txt' should have 1 instance")
+	}
 
 	s.AddScrubberForExtension("txt", secondTextScrubber)
-	assert.Len(t, s.extensionMappedInstanceScrubbers["txt"], 2)
+	if len(s.extensionMappedInstanceScrubbers["txt"]) != 2 {
+		t.Fatalf("extension scrubber for 'txt' should have 2 instances")
+	}
 
 	s.AddScrubberForExtension("json", jsonScrubber)
-	assert.Len(t, s.extensionMappedInstanceScrubbers["txt"], 2)
-	assert.Len(t, s.extensionMappedInstanceScrubbers["json"], 1)
+	if len(s.extensionMappedInstanceScrubbers["txt"]) != 2 {
+		t.Fatalf("extension scrubber for 'txt' should have 2 instances")
+	}
+	if len(s.extensionMappedInstanceScrubbers["json"]) != 1 {
+		t.Fatalf("extension scrubber for 'json' should have 1 instance")
+	}
 }
