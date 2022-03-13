@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
 	"net"
 	"strings"
 	"testing"
@@ -43,16 +42,28 @@ func TestSerializeAndDeserialize(t *testing.T) {
 	serializer := getTestSerializer(true, false)
 	serialized := serializer.Serialize(person)
 
-	assert.NotEmpty(t, serialized)
+	if len(serialized) == 0 {
+		t.Fatalf("serialized string should not be empty")
+	}
 
 	var p Person
 	e := json.Unmarshal([]byte(serialized), &p)
 
-	assert.NoError(t, e)
-	assert.Equal(t, p.GivenNames, person.GivenNames)
-	assert.Equal(t, p.FamilyName, person.FamilyName)
-	assert.Equal(t, p.Dob, person.Dob)
-	assert.Equal(t, p.Address, person.Address)
+	if e != nil {
+		t.Fatalf("Should be able to unmarshal: %s", e)
+	}
+	if person.GivenNames != p.GivenNames {
+		t.Fatalf("GivenNames was not equal: %s", p.GivenNames)
+	}
+	if person.FamilyName != p.FamilyName {
+		t.Fatalf("FamilyName was not equal: %s", p.GivenNames)
+	}
+	if person.Address != p.Address {
+		t.Fatalf("Address was not equal: %s", p.GivenNames)
+	}
+	if person.Dob != p.Dob {
+		t.Fatalf("Dob was not equal: %s", p.GivenNames)
+	}
 }
 
 func TestSerializeScrubbedTime(t *testing.T) {
@@ -67,8 +78,12 @@ func TestSerializeScrubbedTime(t *testing.T) {
 	serializer := getTestSerializer(true, true)
 	serialized := serializer.Serialize(person)
 
-	assert.NotEmpty(t, serialized)
-	assert.Contains(t, serialized, "\"Dob\": \"Time_1\"")
+	if len(serialized) == 0 {
+		t.Fatalf("Should have serialized into string")
+	}
+	if !strings.Contains(serialized, "\"Dob\": \"Time_1\"") {
+		t.Fatalf("Should have scrubbed Dob")
+	}
 }
 
 func TestSerializeScrubbedZeroTime(t *testing.T) {
@@ -81,8 +96,12 @@ func TestSerializeScrubbedZeroTime(t *testing.T) {
 	serializer := getTestSerializer(true, true)
 	serialized := serializer.Serialize(person)
 
-	assert.NotEmpty(t, serialized)
-	assert.Contains(t, serialized, "\"Dob\": \"Time_Zero\"")
+	if len(serialized) == 0 {
+		t.Fatalf("Should have serialized into string")
+	}
+	if !strings.Contains(serialized, "\"Dob\": \"Time_Zero\"") {
+		t.Fatalf("Should have scrubbed Dob as zero time")
+	}
 }
 
 func TestSerializeNonScrubbedZeroTime(t *testing.T) {
@@ -95,8 +114,12 @@ func TestSerializeNonScrubbedZeroTime(t *testing.T) {
 	serializer := getTestSerializer(true, false)
 	serialized := serializer.Serialize(person)
 
-	assert.NotEmpty(t, serialized)
-	assert.Contains(t, serialized, "\"Dob\": \"0001-01-01T00:00:00Z\"")
+	if len(serialized) == 0 {
+		t.Fatalf("Should have serialized into string")
+	}
+	if !strings.Contains(serialized, "\"Dob\": \"0001-01-01T00:00:00Z\"") {
+		t.Fatalf("Should have serialized Dob value")
+	}
 }
 
 func TestSerializeScrubbedStringTypes(t *testing.T) {
@@ -110,10 +133,18 @@ func TestSerializeScrubbedStringTypes(t *testing.T) {
 	serializer := getTestSerializer(true, true)
 	serialized := serializer.Serialize(person)
 
-	assert.NotEmpty(t, serialized)
-	assert.Contains(t, serialized, "TestValue")
-	assert.Contains(t, serialized, "Guid_1")
-	assert.Contains(t, serialized, "Time_1")
+	if len(serialized) == 0 {
+		t.Fatalf("Should have serialized into string")
+	}
+	if !strings.Contains(serialized, "TestValue") {
+		t.Fatalf("Should have serialized 'TestValue'")
+	}
+	if !strings.Contains(serialized, "Guid_1") {
+		t.Fatalf("Should have serialized 'Guid_1'")
+	}
+	if !strings.Contains(serialized, "Time_1") {
+		t.Fatalf("Should have serialized 'Time_1'")
+	}
 }
 
 func TestSerializeNotScrubbedStringTypes(t *testing.T) {
@@ -127,10 +158,18 @@ func TestSerializeNotScrubbedStringTypes(t *testing.T) {
 	serializer := getTestSerializer(false, false)
 	serialized := serializer.Serialize(person)
 
-	assert.NotEmpty(t, serialized)
-	assert.Contains(t, serialized, "TestValue")
-	assert.NotContains(t, serialized, "Guid_1")
-	assert.NotContains(t, serialized, "Time_1")
+	if len(serialized) == 0 {
+		t.Fatalf("Should have serialized into string")
+	}
+	if !strings.Contains(serialized, "TestValue") {
+		t.Fatalf("Should have serialized 'TestValue'")
+	}
+	if strings.Contains(serialized, "Guid_1") {
+		t.Fatalf("Should have serialized 'Guid_1'")
+	}
+	if strings.Contains(serialized, "Time_1") {
+		t.Fatalf("Should have serialized 'Time_1'")
+	}
 }
 
 func TestSerializeStringBuilder(t *testing.T) {
@@ -142,8 +181,12 @@ func TestSerializeStringBuilder(t *testing.T) {
 	serializer := getTestSerializer(true, true)
 	serialized := serializer.Serialize(builder)
 
-	assert.NotEmpty(t, serialized)
-	assert.Contains(t, serialized, "FirstValue\tSecondValue")
+	if len(serialized) == 0 {
+		t.Fatalf("Should have serialized into string")
+	}
+	if !strings.Contains(serialized, "FirstValue\tSecondValue") {
+		t.Fatalf("Should have correct serialized values")
+	}
 }
 
 func TestSerializeMultiLineString(t *testing.T) {
@@ -157,10 +200,18 @@ func TestSerializeMultiLineString(t *testing.T) {
 	serialized := serializer.Serialize(builder)
 	t.Logf("Serialized: %s", serialized)
 
-	assert.NotEmpty(t, serialized)
-	assert.Contains(t, serialized, "FirstValue")
-	assert.Contains(t, serialized, "SecondValue")
-	assert.Contains(t, serialized, "ThirdValue")
+	if len(serialized) == 0 {
+		t.Fatalf("Should have serialized into string")
+	}
+	if !strings.Contains(serialized, "FirstValue") {
+		t.Fatalf("Should have correct serialized values")
+	}
+	if !strings.Contains(serialized, "SecondValue") {
+		t.Fatalf("Should have correct serialized values")
+	}
+	if !strings.Contains(serialized, "ThirdValue") {
+		t.Fatalf("Should have correct serialized values")
+	}
 }
 
 func TestSerializeStringerInterface(t *testing.T) {
@@ -171,8 +222,12 @@ func TestSerializeStringerInterface(t *testing.T) {
 	serializer := getTestSerializer(true, true)
 	serialized := serializer.Serialize(stringer)
 
-	assert.NotEmpty(t, serialized)
-	assert.Contains(t, serialized, "192.168.0.1")
+	if len(serialized) == 0 {
+		t.Fatalf("Should have serialized into string")
+	}
+	if !strings.Contains(serialized, "192.168.0.1") {
+		t.Fatalf("Should have correct serialized values")
+	}
 }
 
 func getTestSerializer(scrubGuid, scrubTime bool) *serializer {

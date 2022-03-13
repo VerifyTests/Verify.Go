@@ -1,7 +1,6 @@
 package diff
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -24,5 +23,7 @@ func TestFetchingProcessesLists(t *testing.T) {
 	p := processCleaner{}
 	procs := p.findAllProcess()
 
-	assert.NotEmpty(t, procs)
+	if procs == nil || len(procs) == 0 {
+		t.Fatalf("processes should not be empty")
+	}
 }

@@ -4,7 +4,6 @@
 package diff
 
 import (
-	"github.com/stretchr/testify/assert"
 	"path/filepath"
 	"testing"
 	"time"
@@ -29,12 +28,17 @@ func TestFindingProcessByName_Integration(t *testing.T) {
 	time.Sleep(time.Second * 3)
 
 	result := r.LaunchTool(VisualStudioCode, tempPath, targetPath)
-	assert.Equal(t, StartedNewInstance, result)
+
+	if result != StartedNewInstance {
+		t.Fatalf("should start a new instance")
+	}
 }
 
 func TestToolsInitialization_Integration(t *testing.T) {
 	tool := tools{}
 	tool.initTools([]ToolKind{VisualStudioCode}, false)
 
-	assert.Len(t, tool.resolved, 2)
+	if len(tool.resolved) != 2 {
+		t.Fatalf("should find two diff tools")
+	}
 }

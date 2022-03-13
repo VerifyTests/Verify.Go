@@ -2,7 +2,6 @@ package verifier
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"strings"
 	"testing"
@@ -18,8 +17,12 @@ func TestScrubber_RemoveLinesContaining(t *testing.T) {
 	scrubber := newDataScrubber(startCounter())
 	scrubbed := scrubber.removeLinesContaining(builder.String(), true, "test", "multiline")
 
-	assert.NotContains(t, scrubbed, "test")
-	assert.NotContains(t, scrubbed, "multiline")
+	if strings.Contains(scrubbed, "test") {
+		t.Fatalf("Should have the value")
+	}
+	if strings.Contains(scrubbed, "multiline") {
+		t.Fatalf("Should have the value")
+	}
 }
 
 func TestScrubber_ScrubGuid(t *testing.T) {
@@ -29,8 +32,12 @@ func TestScrubber_ScrubGuid(t *testing.T) {
 	scrubber := newDataScrubber(startCounter())
 	scrubbed := scrubber.replaceGuids(guid)
 
-	assert.Equal(t, scrubbed, "Guid_1")
-	assert.NotContains(t, scrubbed, guid)
+	if !strings.Contains(scrubbed, "Guid_1") {
+		t.Fatalf("Should have the value")
+	}
+	if strings.Contains(scrubbed, guid) {
+		t.Fatalf("Should not contain the guid value")
+	}
 }
 
 func TestScrubber_ScrubInlineGuid(t *testing.T) {
@@ -44,8 +51,12 @@ func TestScrubber_ScrubInlineGuid(t *testing.T) {
 	scrubber := newDataScrubber(startCounter())
 	scrubbed := scrubber.replaceGuids(builder.String())
 
-	assert.NotContains(t, scrubbed, guid)
-	assert.Contains(t, scrubbed, "multiline line with uuid of Guid_1")
+	if strings.Contains(scrubbed, guid) {
+		t.Fatalf("Should not contain the guid value")
+	}
+	if !strings.Contains(scrubbed, "multiline line with uuid of Guid_1") {
+		t.Fatalf("Should contain the line with scrubbed guid")
+	}
 }
 
 func TestScrubber_FilterLinesWithoutLastLineEnd(t *testing.T) {
@@ -59,9 +70,15 @@ func TestScrubber_FilterLinesWithoutLastLineEnd(t *testing.T) {
 	scrubber := newDataScrubber(startCounter())
 	scrubbed := scrubber.replaceLines(builder.String(), testLineRemover)
 
-	assert.NotContains(t, scrubbed, "test")
-	assert.Contains(t, scrubbed, "replacement")
-	assert.False(t, strings.HasSuffix(scrubbed, "\n"))
+	if strings.Contains(scrubbed, "test") {
+		t.Fatalf("Should contain the value")
+	}
+	if !strings.Contains(scrubbed, "replacement") {
+		t.Fatalf("Should contain the value")
+	}
+	if strings.HasSuffix(scrubbed, "\n") {
+		t.Fatalf("Should not contain the ending new line")
+	}
 }
 
 func TestScrubber_ScrubMachineName(t *testing.T) {
@@ -72,7 +89,9 @@ func TestScrubber_ScrubMachineName(t *testing.T) {
 	scrubber := newDataScrubber(startCounter())
 	scrubbed := scrubber.ScrubMachineName(target)
 
-	assert.NotContains(t, scrubbed, host)
+	if strings.Contains(scrubbed, host) {
+		t.Fatalf("Should not contain the initial value")
+	}
 }
 
 func TestScrubber_CurrentDirectory(t *testing.T) {
@@ -90,7 +109,10 @@ func TestScrubber_CurrentDirectory(t *testing.T) {
 	scrubber.Apply("txt", &builder, newSettings())
 
 	output := builder.String()
-	assert.Equal(t, "{ExeDir}\n{CurrentDirectory}\n{TempDir}\n{CacheDir}", output)
+
+	if !strings.Contains(output, "{ExeDir}\n{CurrentDirectory}\n{TempDir}\n{CacheDir}") {
+		t.Fatalf("Should scrub well known directories")
+	}
 }
 
 func TestScrubber_FilterLinesWithLineEnd(t *testing.T) {
@@ -102,9 +124,15 @@ func TestScrubber_FilterLinesWithLineEnd(t *testing.T) {
 	scrubber := newDataScrubber(startCounter())
 	scrubbed := scrubber.replaceLines(builder.String(), testLineRemover)
 
-	assert.Contains(t, scrubbed, "this is\n")
-	assert.Contains(t, scrubbed, "a replacement\n")
-	assert.True(t, strings.HasSuffix(scrubbed, "\n"))
+	if !strings.Contains(scrubbed, "this is\n") {
+		t.Fatalf("should contain the value")
+	}
+	if !strings.Contains(scrubbed, "a replacement\n") {
+		t.Fatalf("should contain the value")
+	}
+	if !strings.HasSuffix(scrubbed, "\n") {
+		t.Fatalf("should contain the last new line")
+	}
 }
 
 var testLineRemover = func(value string) string {

@@ -1,17 +1,24 @@
 package utils
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestGetFileExtension(t *testing.T) {
-	assert.Equal(t, "txt", File.GetFileExtension("textfile.txt"))
-	assert.Equal(t, "json", File.GetFileExtension("textfile.json"))
-	assert.Equal(t, "txt", File.GetFileExtension("txt"))
+	if File.GetFileExtension("textfile.txt") != "txt" {
+		t.Fatalf("should get the right file extension")
+	}
+	if File.GetFileExtension("textfile.json") != "json" {
+		t.Fatalf("should get the right file extension")
+	}
+	if File.GetFileExtension("txt") != "txt" {
+		t.Fatalf("should get the right file extension")
+	}
 }
 
 func TestFileReading(t *testing.T) {
 	content := File.ReadText("../_testdata/verifier_test.TestNilTargets.verified.txt")
-	assert.NotEmpty(t, content)
+	if len(content) == 0 {
+		t.Fatalf("should read file content")
+	}
 }

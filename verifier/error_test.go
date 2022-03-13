@@ -1,7 +1,7 @@
 package verifier
 
 import (
-	"github.com/stretchr/testify/assert"
+	"strings"
 	"testing"
 )
 
@@ -50,12 +50,28 @@ func TestErrorReporting(t *testing.T) {
 
 	msg := builder.build()
 
-	assert.NotEmpty(t, msg)
-	assert.Contains(t, msg, "Deleted")
-	assert.Contains(t, msg, "New:")
-	assert.Contains(t, msg, "NotEqual:")
-	assert.Contains(t, msg, "Delete:")
-	assert.Contains(t, msg, "FileContent:")
-	assert.Contains(t, msg, "ManualTestCase")
-	assert.Contains(t, msg, t.Name())
+	if len(msg) == 0 {
+		t.Fatalf("Should have generated report")
+	}
+	if !strings.Contains(msg, "Deleted") {
+		t.Fatalf("Should contain the value")
+	}
+	if !strings.Contains(msg, "New:") {
+		t.Fatalf("Should contain the value")
+	}
+	if !strings.Contains(msg, "NotEqual:") {
+		t.Fatalf("Should contain the value")
+	}
+	if !strings.Contains(msg, "Delete:") {
+		t.Fatalf("Should contain the value")
+	}
+	if !strings.Contains(msg, "FileContent:") {
+		t.Fatalf("Should contain the value")
+	}
+	if !strings.Contains(msg, "ManualTestCase") {
+		t.Fatalf("Should contain the value")
+	}
+	if !strings.Contains(msg, t.Name()) {
+		t.Fatalf("Should contain the value")
+	}
 }

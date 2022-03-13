@@ -1,7 +1,7 @@
 package diff
 
 import (
-	"github.com/stretchr/testify/assert"
+	"github.com/VerifyTests/Verify.Go/utils"
 	"os"
 	"path/filepath"
 	"testing"
@@ -18,8 +18,9 @@ func TestFinderMultiMatchDir(t *testing.T) {
 
 	result, found := finder.TryFind(path)
 
-	assert.True(t, found)
-	assert.FileExists(t, result)
+	if !found || !utils.File.Exists(result) {
+		t.Fatalf("should find the file at path: %s", path)
+	}
 }
 
 func TestFinderMultiMatchDirReverseOrder(t *testing.T) {
@@ -33,8 +34,9 @@ func TestFinderMultiMatchDirReverseOrder(t *testing.T) {
 
 	result, found := finder.TryFind(path)
 
-	assert.True(t, found)
-	assert.FileExists(t, result)
+	if !found || !utils.File.Exists(result) {
+		t.Fatalf("should find the file at path: %s", path)
+	}
 }
 
 func TestFinderFindFullPath(t *testing.T) {
@@ -43,18 +45,20 @@ func TestFinderFindFullPath(t *testing.T) {
 
 	result, found := finder.TryFind(path)
 
-	assert.True(t, found)
-	assert.FileExists(t, result)
+	if !found || !utils.File.Exists(result) {
+		t.Fatalf("should find the file at path: %s", path)
+	}
 }
 
 func TestFinderNonExistingFile(t *testing.T) {
 	var path, _ = filepath.Abs("../_testdata/DirForSearch/dir2/TextFile2.bin")
 	var finder = newFinder()
 
-	result, found := finder.TryFind(path)
+	_, found := finder.TryFind(path)
 
-	assert.False(t, found)
-	assert.Empty(t, result)
+	if found {
+		t.Fatalf("should not find the non-existing file at path: %s", path)
+	}
 }
 
 func TestFinderWildcardInDirectory(t *testing.T) {
@@ -63,18 +67,20 @@ func TestFinderWildcardInDirectory(t *testing.T) {
 
 	result, found := finder.TryFind(path)
 
-	assert.True(t, found)
-	assert.FileExists(t, result)
+	if !found || !utils.File.Exists(result) {
+		t.Fatalf("should find the file at path: %s", path)
+	}
 }
 
 func TestFinderWildcardMissing(t *testing.T) {
 	var path, _ = filepath.Abs("../_testdata/*/dir3/TextFile1.txt")
 	var finder = newFinder()
 
-	result, found := finder.TryFind(path)
+	_, found := finder.TryFind(path)
 
-	assert.False(t, found)
-	assert.Empty(t, result)
+	if found {
+		t.Fatalf("should not find the non-existing file at path: %s", path)
+	}
 }
 
 func createTestDir(t *testing.T, dir string, time time.Time) {
@@ -82,9 +88,13 @@ func createTestDir(t *testing.T, dir string, time time.Time) {
 		_ = os.Chtimes(dir, time, time)
 	} else {
 		mke := os.Mkdir(dir, 0700)
-		assert.NoError(t, mke)
+		if mke != nil {
+			t.Fatalf("should not have errors creating directories: %s", mke)
+		}
 
 		che := os.Chtimes(dir, time, time)
-		assert.NoError(t, che)
+		if mke != nil {
+			t.Fatalf("should not have errors accessing directory times: %s", che)
+		}
 	}
 }
