@@ -14,7 +14,7 @@ func TestFinderMultiMatchDir(t *testing.T) {
 	createTestDir(t, "../_testdata/DirForSearch/dir1", time.Now())
 
 	var path = filepath.Join("../_testdata/DirForSearch", "*", "TextFile1.txt")
-	var finder = newFinder()
+	var finder = newDiffFinder()
 
 	result, found := finder.TryFind(path)
 
@@ -30,7 +30,7 @@ func TestFinderMultiMatchDirReverseOrder(t *testing.T) {
 
 	var path = filepath.Join("../_testdata/DirForSearch", "*", "TextFile1.txt")
 
-	var finder = newFinder()
+	var finder = newDiffFinder()
 
 	result, found := finder.TryFind(path)
 
@@ -41,7 +41,7 @@ func TestFinderMultiMatchDirReverseOrder(t *testing.T) {
 
 func TestFinderFindFullPath(t *testing.T) {
 	var path, _ = filepath.Abs("../_testdata/DirForSearch/dir2/TextFile2.txt")
-	var finder = newFinder()
+	var finder = newDiffFinder()
 
 	result, found := finder.TryFind(path)
 
@@ -52,7 +52,7 @@ func TestFinderFindFullPath(t *testing.T) {
 
 func TestFinderNonExistingFile(t *testing.T) {
 	var path, _ = filepath.Abs("../_testdata/DirForSearch/dir2/TextFile2.bin")
-	var finder = newFinder()
+	var finder = newDiffFinder()
 
 	_, found := finder.TryFind(path)
 
@@ -63,7 +63,7 @@ func TestFinderNonExistingFile(t *testing.T) {
 
 func TestFinderWildcardInDirectory(t *testing.T) {
 	var path, _ = filepath.Abs("../_testdata/*/dir1/TextFile1.txt")
-	var finder = newFinder()
+	var finder = newDiffFinder()
 
 	result, found := finder.TryFind(path)
 
@@ -74,7 +74,7 @@ func TestFinderWildcardInDirectory(t *testing.T) {
 
 func TestFinderWildcardMissing(t *testing.T) {
 	var path, _ = filepath.Abs("../_testdata/*/dir3/TextFile1.txt")
-	var finder = newFinder()
+	var finder = newDiffFinder()
 
 	_, found := finder.TryFind(path)
 

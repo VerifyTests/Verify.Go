@@ -1,7 +1,7 @@
 package diff
 
 import (
-	"fmt"
+	"github.com/VerifyTests/Verify.Go/utils"
 	"os"
 	"path/filepath"
 	"sort"
@@ -13,14 +13,16 @@ type diffFinder struct {
 	logger Logger
 }
 
-var finder = newFinder()
+var finder = newDiffFinder()
 
-func newFinder() *diffFinder {
+// newDiffFinder creates a new diffFinder instance
+func newDiffFinder() *diffFinder {
 	return &diffFinder{
 		logger: newLogger("finder"),
 	}
 }
 
+// TryFindExe tries to find the diff tool at all the specified paths
 func (f *diffFinder) TryFindExe(paths []string) (exePath string, found bool) {
 	ps := f.unique(paths)
 	for _, p := range ps {
@@ -31,10 +33,11 @@ func (f *diffFinder) TryFindExe(paths []string) (exePath string, found bool) {
 	return "", false
 }
 
+// TryFind tries to find the diff tool at the specified paths
 func (f *diffFinder) TryFind(path string) (result string, found bool) {
 	expanded := os.ExpandEnv(path)
 	if !strings.ContainsRune(expanded, '*') {
-		if f.fileExists(expanded) {
+		if utils.File.Exists(expanded) {
 			result = expanded
 			found = true
 			return
@@ -45,7 +48,7 @@ func (f *diffFinder) TryFind(path string) (result string, found bool) {
 	}
 
 	var filePart = filepath.Base(expanded)
-	var directoryPart = f.getDirectoryName(expanded)
+	var directoryPart = utils.File.GetDirectoryName(expanded)
 	var directories = f.getDirectories(directoryPart)
 
 	for _, dir := range directories {
@@ -54,22 +57,13 @@ func (f *diffFinder) TryFind(path string) (result string, found bool) {
 		}
 
 		var filePath = filepath.Join(dir, filePart)
-		if f.fileExists(filePath) {
+		if utils.File.Exists(filePath) {
 			return filePath, true
 		}
 	}
 
 	f.logger.Info("could not find file: %s", path)
 	return "", false
-}
-
-func (f *diffFinder) getDirectoryName(path string) string {
-	dir := filepath.Dir(path)
-	abs, err := filepath.Abs(dir)
-	if err != nil {
-		panic(fmt.Sprintf("failed to get directory Name: %s", err.Error()))
-	}
-	return abs
 }
 
 func (f *diffFinder) unique(slice []string) []string {
@@ -84,17 +78,11 @@ func (f *diffFinder) unique(slice []string) []string {
 	return list
 }
 
-func (f *diffFinder) fileExists(expanded string) bool {
-	if _, err := os.Stat(expanded); err == nil {
-		return true
-	}
-	return false
-}
-
 func (f *diffFinder) getDirectories(directory string) []string {
 	var expanded = os.ExpandEnv(directory)
 	if !strings.ContainsRune(expanded, '*') {
-		if f.directoryExists(directory) {
+		dirExists, _ := utils.File.FileOrDirectoryExists(directory)
+		if dirExists {
 			return []string{directory}
 		}
 	}
@@ -114,7 +102,8 @@ func (f *diffFinder) getDirectories(directory string) []string {
 				newRoots = append(newRoots, matches...)
 			} else {
 				var newRoot = filepath.Join(root, segment)
-				if f.directoryExists(newRoot) {
+				var dirExists, _ = utils.File.FileOrDirectoryExists(newRoot)
+				if dirExists {
 					newRoots = append(newRoots, newRoot)
 				}
 			}
@@ -161,11 +150,4 @@ func (f *diffFinder) getDirectoriesFromRoot(root, segment string) ([]string, err
 		sorted = append(sorted, match.name)
 	}
 	return sorted, nil
-}
-
-func (f *diffFinder) directoryExists(directory string) bool {
-	if _, err := os.Stat(directory); os.IsNotExist(err) {
-		return false
-	}
-	return true
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,6 +17,51 @@ type Files struct {
 
 // File an instance of the Files struct.
 var File = Files{}
+
+// GetDirectoriesFromRoot returns the list of directories in a root directory, including all inner sub directories
+func (f *Files) GetDirectoriesFromRoot(root string) ([]string, error) {
+	matches := make([]string, 0)
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			matches = append(matches, path)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return matches, nil
+}
+
+func (f *Files) GetDirectoryName(path string) string {
+	dir := filepath.Dir(path)
+	abs, err := filepath.Abs(dir)
+	if err != nil {
+		panic(fmt.Sprintf("failed to get directory Name: %s", err.Error()))
+	}
+	return abs
+}
+
+// GetFullPath returns the full path to the file
+func (f *Files) GetFullPath(file string) string {
+	path, err := filepath.Abs(file)
+	if err != nil {
+		log.Fatalf("failed to get full path of file/dir: %s", file)
+	}
+	return path
+}
+
+// GetCurrentDirectory returns the current directory
+func (f *Files) GetCurrentDirectory() string {
+	wd, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("failed to get the current directory")
+	}
+	return wd
+}
 
 // GetFileNameWithoutExtension returns the name of the file without its extension.
 func (f *Files) GetFileNameWithoutExtension(fileName string) string {
