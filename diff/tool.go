@@ -7,19 +7,21 @@ import (
 	"strings"
 )
 
-type tools struct {
+type Tools struct {
 	resolved        []*ResolvedTool
 	pathLookup      map[string]*ResolvedTool
 	extensionLookup map[string]*ResolvedTool
 }
 
-func newTools() *tools {
-	t := &tools{}
+// NewTools creates a new diff tool accessor
+func NewTools() *Tools {
+	t := &Tools{}
 	t.reset()
 	return t
 }
 
-func (t *tools) tryFind(kind ToolKind) (tool *ResolvedTool, found bool) {
+// TryFind finds a tool by the provided kind
+func (t *Tools) TryFind(kind ToolKind) (tool *ResolvedTool, found bool) {
 	for _, rt := range t.resolved {
 		if rt.Kind == kind {
 			return rt, true
@@ -28,7 +30,16 @@ func (t *tools) tryFind(kind ToolKind) (tool *ResolvedTool, found bool) {
 	return nil, false
 }
 
-func (t *tools) tryFindForExtension(extension string) (tool *ResolvedTool, found bool) {
+// TryFindByPath finds a tool by the provided path
+func (t *Tools) TryFindByPath(path string) (tool *ResolvedTool, found bool) {
+	if tool, ok := t.pathLookup[path]; ok {
+		return tool, true
+	}
+	return nil, false
+}
+
+//TryFindForExtension finds a tool based on the provided extension
+func (t *Tools) TryFindForExtension(extension string) (tool *ResolvedTool, found bool) {
 	extension = utils.File.GetFileExtension(extension)
 	if utils.File.IsText(extension) {
 		for _, tool := range t.resolved {
@@ -43,7 +54,7 @@ func (t *tools) tryFindForExtension(extension string) (tool *ResolvedTool, found
 	return nil, false
 }
 
-func (t *tools) reset() {
+func (t *Tools) reset() {
 	t.extensionLookup = make(map[string]*ResolvedTool)
 	t.resolved = make([]*ResolvedTool, 0)
 
@@ -51,7 +62,7 @@ func (t *tools) reset() {
 	t.initTools(result.Order, result.Found)
 }
 
-func (t *tools) initTools(tools []ToolKind, resultFoundInEnvVar bool) {
+func (t *Tools) initTools(tools []ToolKind, resultFoundInEnvVar bool) {
 	t.extensionLookup = make(map[string]*ResolvedTool)
 	t.pathLookup = make(map[string]*ResolvedTool, 0)
 	t.resolved = make([]*ResolvedTool, 0)
@@ -63,7 +74,7 @@ func (t *tools) initTools(tools []ToolKind, resultFoundInEnvVar bool) {
 	//add custom to the start
 }
 
-func (t *tools) sort(order []ToolKind, throwForNoTool bool) []*ToolDefinition {
+func (t *Tools) sort(order []ToolKind, throwForNoTool bool) []*ToolDefinition {
 	foundDefinitions := make([]*ToolDefinition, 0)
 	allTools := make([]*ToolDefinition, len(AllDefinedTools))
 	copy(allTools, AllDefinedTools)
@@ -106,7 +117,7 @@ func getIndexOfDefinition(slice []*ToolDefinition, e *ToolDefinition) int {
 	return -1 // not found.
 }
 
-func (t *tools) findByKind(definedTools []*ToolDefinition, kind ToolKind) (result *ToolDefinition, found bool) {
+func (t *Tools) findByKind(definedTools []*ToolDefinition, kind ToolKind) (result *ToolDefinition, found bool) {
 	for _, defined := range definedTools {
 		if defined.Kind == kind {
 			return defined, true
@@ -115,14 +126,14 @@ func (t *tools) findByKind(definedTools []*ToolDefinition, kind ToolKind) (resul
 	return &ToolDefinition{}, false
 }
 
-func (t *tools) AddTool(name string, autoRefresh bool, isMdi bool, supportsText bool, requiresTarget bool,
+func (t *Tools) AddTool(name string, autoRefresh bool, isMdi bool, supportsText bool, requiresTarget bool,
 	targetLeftArguments BuildArguments, targetRightArguments BuildArguments,
 	exePath string, binaryExtensions []string) (*ResolvedTool, bool) {
 	return t.addTool(name, None, autoRefresh, isMdi, supportsText, requiresTarget,
 		binaryExtensions, exePath, targetLeftArguments, targetRightArguments)
 }
 
-func (t *tools) addToolWithSettings(name string, diffTool ToolKind, autoRefresh, isMdi, supportsText, requiresTarget bool,
+func (t *Tools) addToolWithSettings(name string, diffTool ToolKind, autoRefresh, isMdi, supportsText, requiresTarget bool,
 	binaryExtensions []string, windows, linux, osx *OsSettings) (*ResolvedTool, bool) {
 
 	if windows == nil && linux == nil && osx == nil {
@@ -138,7 +149,7 @@ func (t *tools) addToolWithSettings(name string, diffTool ToolKind, autoRefresh,
 		requiresTarget, binaryExtensions, exe, left, right)
 }
 
-func (t *tools) addTool(name string, diffTool ToolKind, autoRefresh bool, isMdi bool,
+func (t *Tools) addTool(name string, diffTool ToolKind, autoRefresh bool, isMdi bool,
 	supportsText bool, requiresTarget bool, binaries []string, exePath string,
 	targetLeftArguments BuildArguments, targetRightArguments BuildArguments) (*ResolvedTool, bool) {
 
@@ -170,7 +181,7 @@ func (t *tools) addTool(name string, diffTool ToolKind, autoRefresh bool, isMdi 
 	return tool, true
 }
 
-func (t *tools) toolExists(name string) bool {
+func (t *Tools) toolExists(name string) bool {
 	for _, resolve := range t.resolved {
 		if resolve.Name == name {
 			return true
@@ -184,7 +195,7 @@ type orderResult struct {
 	Order []ToolKind
 }
 
-func (t *tools) readToolOrder() orderResult {
+func (t *Tools) readToolOrder() orderResult {
 	diffOrder, found := os.LookupEnv("DiffEngine_ToolOrder")
 	var order []ToolKind
 	if found {
@@ -199,7 +210,7 @@ func (t *tools) readToolOrder() orderResult {
 	}
 }
 
-func (t *tools) parseEnvironment(diffOrder string) []ToolKind {
+func (t *Tools) parseEnvironment(diffOrder string) []ToolKind {
 	sep := func(r rune) bool {
 		return r == ',' || r == '|' || r == ' '
 	}
@@ -211,7 +222,7 @@ func (t *tools) parseEnvironment(diffOrder string) []ToolKind {
 	return tools
 }
 
-func (t *tools) AddResolvedToolAtStart(tool *ResolvedTool) {
+func (t *Tools) AddResolvedToolAtStart(tool *ResolvedTool) {
 	t.resolved = append([]*ResolvedTool{tool}, t.resolved...)
 	for _, ext := range tool.BinaryExtensions {
 		cleanedExtension := utils.File.GetFileExtension(ext)

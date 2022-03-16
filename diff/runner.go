@@ -10,7 +10,7 @@ type runner struct {
 	directory  string
 	ciDetected CIDetected
 	finder     *diffFinder
-	tool       *tools
+	tool       *Tools
 	counter    *instanceCounter
 	proc       *processCleaner
 	logger     Logger
@@ -41,7 +41,7 @@ func Kill(tempFile, targetFile string) {
 	runner := newRunner(envReader)
 
 	extension := utils.File.GetFileExtension(tempFile)
-	diffTool, found := runner.tool.tryFindForExtension(extension)
+	diffTool, found := runner.tool.TryFindForExtension(extension)
 	if !found {
 		runner.logger.Info("Extension not found. %s", extension)
 		return
@@ -60,8 +60,8 @@ func newRunner(reader EnvReader) *runner {
 	runner := &runner{
 		disabled:   checkDisabled(reader),
 		ciDetected: checkCI(reader),
-		finder:     newFinder(),
-		tool:       newTools(),
+		finder:     newDiffFinder(),
+		tool:       NewTools(),
 		counter:    newInstanceCounter(reader),
 		proc:       newProcessCleaner(),
 		logger:     newLogger("runner"),
@@ -76,7 +76,7 @@ func (r *runner) Launch(tempFile, targetFile string) LaunchResult {
 
 	finder := func() (resolved *ResolvedTool, found bool) {
 		extension := utils.File.GetFileExtension(tempFile)
-		return r.tool.tryFindForExtension(extension)
+		return r.tool.TryFindForExtension(extension)
 	}
 
 	return r.innerLaunch(finder, tempFile, targetFile)
@@ -87,7 +87,7 @@ func (r *runner) LaunchTool(kind ToolKind, tempFile, targetFile string) LaunchRe
 	utils.Guard.GuardFiles(tempFile, targetFile)
 
 	finder := func() (resolved *ResolvedTool, found bool) {
-		return r.tool.tryFind(kind)
+		return r.tool.TryFind(kind)
 	}
 
 	return r.innerLaunch(finder, tempFile, targetFile)

@@ -22,7 +22,7 @@ func TestFindingProcessByName_Integration(t *testing.T) {
 	file.writeText(target, "target file")
 
 	r := newRunner(env)
-	vs, _ := r.tool.tryFind(VisualStudioCode)
+	vs, _ := r.tool.TryFind(VisualStudioCode)
 	r.proc.Kill(vs.ExePath)
 
 	time.Sleep(time.Second * 3)
@@ -35,7 +35,7 @@ func TestFindingProcessByName_Integration(t *testing.T) {
 }
 
 func TestToolsInitialization_Integration(t *testing.T) {
-	tool := tools{}
+	tool := Tools{}
 	tool.initTools([]ToolKind{VisualStudioCode}, false)
 
 	if len(tool.resolved) != 2 {
