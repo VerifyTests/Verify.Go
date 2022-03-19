@@ -1,15 +1,19 @@
-//go:build integration
-// +build integration
-
 package tray
 
 import (
 	"github.com/stretchr/testify/assert"
+	"os"
+	"strconv"
 	"testing"
 	"time"
 )
 
-func TestClient_SendDeleteAndSendMove(t *testing.T) {
+func TestClient_SendDeleteAndSendMove_Integration(t *testing.T) {
+	runTests, _ := strconv.ParseBool(os.Getenv("RUN_INTEGRATION_TESTS"))
+	if !runTests {
+		t.Skip("Skipping integration tests")
+	}
+
 	var deleted *DeletePayload
 	var moved *MovePayload
 

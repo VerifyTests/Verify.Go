@@ -22,8 +22,8 @@ jobs:
       with:
         go-version: ${{ matrix.go_version }}
     - name: Build
-      run: make build-all
+      run: make run-build
     - name: Vet
-      run: make vet-all
+      run: make run-vet
     - name: Test
-      run: make unit-test-all
+      run: make run-tests

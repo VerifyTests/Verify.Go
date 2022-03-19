@@ -24,9 +24,10 @@ run-tests:
 	echo "Running unit tests for 'tray'..."
 	go test -v ./tray/*.go
 
+run-integration-test: export RUN_INTEGRATION_TESTS=True
 run-integration-test:
-	echo "Running integration tests for 'diff'..."
-	go build -tags=integration ./...
-	go test -v ./... -tags=integration
+	echo "Should run integration tests: $$RUN_INTEGRATION_TESTS"
+	echo "Running integration tests..."
+	go test -v ./... -run Integration
 
 all: run-build run-vet run-tests
