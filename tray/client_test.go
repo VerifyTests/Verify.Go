@@ -30,7 +30,7 @@ func TestClient_SendDeleteAndSendMove_Integration(t *testing.T) {
 
 	client := NewClient()
 	client.SendDelete("testFile.txt")
-	client.SendMove("test.received.txt", "test.verified.txt", "", "", false, 0)
+	client.SendMove("test.received.txt", "test.verified.txt", "", nil, false, 0)
 
 	assert.Eventually(t, func() bool {
 		return deleted != nil &&

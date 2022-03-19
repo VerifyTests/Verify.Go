@@ -32,7 +32,7 @@ func (d *Client) SendDelete(file string) {
 }
 
 // SendMove sends move information to the server
-func (d *Client) SendMove(tempFile, targetFile, exe, arguments string, canKill bool, processId int) {
+func (d *Client) SendMove(tempFile, targetFile, exe string, arguments []string, canKill bool, processId int32) {
 	go d.sendMove(tempFile, targetFile, exe, arguments, canKill, processId)
 }
 
@@ -50,7 +50,7 @@ func (d *Client) sendDelete(file string) {
 	d.sendData(data)
 }
 
-func (d *Client) sendMove(temp, target, exe, arguments string, canKill bool, processId int) {
+func (d *Client) sendMove(temp, target, exe string, arguments []string, canKill bool, processId int32) {
 	payload := MovePayload{
 		Type:      "Move",
 		Target:    target,

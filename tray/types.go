@@ -6,9 +6,9 @@ type MovePayload struct {
 	Temp      string
 	Target    string
 	Exe       string
-	Arguments string
+	Arguments []string
 	CanKill   bool
-	ProcessId int
+	ProcessId int32
 }
 
 // DeletePayload delete file information

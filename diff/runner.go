@@ -1,6 +1,7 @@
 package diff
 
 import (
+	"github.com/VerifyTests/Verify.Go/tray"
 	"github.com/VerifyTests/Verify.Go/utils"
 	"os"
 	"strings"
@@ -13,6 +14,7 @@ type runner struct {
 	tool       *Tools
 	counter    *instanceCounter
 	proc       *processCleaner
+	client     *tray.Client
 	logger     Logger
 	disabled   bool
 }
@@ -64,6 +66,7 @@ func newRunner(reader EnvReader) *runner {
 		tool:       NewTools(),
 		counter:    newInstanceCounter(reader),
 		proc:       newProcessCleaner(),
+		client:     tray.NewClient(),
 		logger:     newLogger("runner"),
 	}
 
@@ -102,10 +105,11 @@ func (r *runner) innerLaunch(tryResolveTool TryResolveTool, tempFile, targetFile
 
 	args, cmd := tool.commandAndArguments(tempFile, targetFile)
 
-	_, found := r.proc.GetProcessInfo(cmd)
+	canKill := !tool.IsMdi
+	processCommand, found := r.proc.GetProcessInfo(cmd)
 	if found {
 		if tool.AutoRefresh {
-			//TODO: DiffEngineTray.AddMove
+			r.client.SendMove(tempFile, targetFile, tool.ExePath, args, canKill, processCommand.Process)
 			return AlreadyRunningAndSupportsRefresh
 		}
 
@@ -113,13 +117,13 @@ func (r *runner) innerLaunch(tryResolveTool TryResolveTool, tempFile, targetFile
 	}
 
 	if r.counter.ReachedMax() {
-		//TODO: DiffEngineTray.AddMove
+		r.client.SendMove(tempFile, targetFile, tool.ExePath, args, canKill, 0)
 		return TooManyRunningDiffTools
 	}
 
-	_ = r.LaunchProcess(tool, args)
-	//TODO: DiffEngineTray.AddMove
-
+	processId := r.LaunchProcess(tool, args)
+	r.client.SendMove(tempFile, targetFile, tool.ExePath, args, canKill, processId)
+	
 	return StartedNewInstance
 }
 
