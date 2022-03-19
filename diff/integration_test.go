@@ -4,6 +4,7 @@
 package diff
 
 import (
+	"github.com/VerifyTests/Verify.Go/utils"
 	"path/filepath"
 	"testing"
 	"time"
@@ -18,8 +19,8 @@ func TestFindingProcessByName_Integration(t *testing.T) {
 	target := filepath.Join("../_testdata", "target.txt")
 	targetPath, _ := filepath.Abs(target)
 
-	file.writeText(temp, "temp file")
-	file.writeText(target, "target file")
+	utils.File.WriteText(temp, "temp file")
+	utils.File.WriteText(target, "target file")
 
 	r := newRunner(env)
 	vs, _ := r.tool.TryFind(VisualStudioCode)

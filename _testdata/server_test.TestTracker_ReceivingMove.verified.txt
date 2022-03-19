@@ -1,0 +1,9 @@
+{
+    "Type": "Move",
+    "Temp": "",
+    "Target": "",
+    "Exe": "theExe",
+    "Arguments": "TheArguments \"s\"",
+    "CanKill": true,
+    "ProcessId": 10
+}
