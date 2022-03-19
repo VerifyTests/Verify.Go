@@ -215,7 +215,7 @@ func (e *engine) runDiffAutoCheck(item FilePair) {
 		return
 	}
 
-	if e.settings.diffDisabled {
+	if !e.settings.diffDisabled {
 		diff.Launch(item.ReceivedPath, item.VerifiedPath)
 	}
 }
