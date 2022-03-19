@@ -24,11 +24,13 @@ func NewServer() *Server {
 }
 
 func (t *Server) Start() {
+	log.Printf("Starting the server")
 	go t.startReceiver()
 	go t.startProcessor(t.processor)
 }
 
 func (t *Server) Stop() {
+	log.Printf("Stopping the server")
 	t.stopped = true
 	close(t.processor)
 }
