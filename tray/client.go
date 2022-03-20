@@ -1,6 +1,7 @@
 package tray
 
 import (
+	"github.com/VerifyTests/Verify.Go/utils"
 	"log"
 	"net"
 	"strconv"
@@ -28,12 +29,12 @@ func (d *Client) Connects() bool {
 
 // SendDelete sends delete information to the server
 func (d *Client) SendDelete(file string) {
-	go d.sendDelete(file)
+	d.sendDelete(file)
 }
 
 // SendMove sends move information to the server
 func (d *Client) SendMove(tempFile, targetFile, exe string, arguments []string, canKill bool, processId int32) {
-	go d.sendMove(tempFile, targetFile, exe, arguments, canKill, processId)
+	d.sendMove(tempFile, targetFile, exe, arguments, canKill, processId)
 }
 
 func (d *Client) sendDelete(file string) {
@@ -53,8 +54,8 @@ func (d *Client) sendDelete(file string) {
 func (d *Client) sendMove(temp, target, exe string, arguments []string, canKill bool, processId int32) {
 	payload := MovePayload{
 		Type:      "Move",
-		Target:    target,
-		Temp:      temp,
+		Target:    utils.File.GetFullPath(target),
+		Temp:      utils.File.GetFullPath(temp),
 		Exe:       exe,
 		Arguments: arguments,
 		CanKill:   canKill,
@@ -87,12 +88,12 @@ func (d *Client) getConnection() (net.Conn, error) {
 func (d *Client) sendData(data []byte) {
 	conn, err := d.getConnection()
 	if err != nil {
-		log.Println("failed to get a connection to tray app")
+		log.Printf("Could not get a connection to the tray app: %s", err)
 	}
 
 	_, err = conn.Write(data)
 	if err != nil {
-		log.Println("failed to write data to tray app")
+		log.Printf("Failed to write data to the tray app: %s", err)
 	}
 
 	_ = conn.Close()
