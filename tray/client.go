@@ -15,7 +15,7 @@ func NewClient() *Client {
 	return &Client{}
 }
 
-func (d *Client) Connects() bool {
+func (d *Client) IsRunning() bool {
 	conn, err := d.getConnection()
 	if err != nil {
 		return false
@@ -27,20 +27,20 @@ func (d *Client) Connects() bool {
 	return true
 }
 
-// SendDelete sends delete information to the server
-func (d *Client) SendDelete(file string) {
+// AddDelete sends delete information to the server
+func (d *Client) AddDelete(file string) {
 	d.sendDelete(file)
 }
 
-// SendMove sends move information to the server
-func (d *Client) SendMove(tempFile, targetFile, exe string, arguments []string, canKill bool, processId int32) {
+// AddMove sends move information to the server
+func (d *Client) AddMove(tempFile, targetFile, exe string, arguments []string, canKill bool, processId int32) {
 	d.sendMove(tempFile, targetFile, exe, arguments, canKill, processId)
 }
 
 func (d *Client) sendDelete(file string) {
 	payload := DeletePayload{
 		Type: "Delete",
-		File: file,
+		File: utils.File.GetFullPath(file),
 	}
 
 	data, err := serialize(payload)
@@ -89,11 +89,13 @@ func (d *Client) sendData(data []byte) {
 	conn, err := d.getConnection()
 	if err != nil {
 		log.Printf("Could not get a connection to the tray app: %s", err)
+		return
 	}
 
 	_, err = conn.Write(data)
 	if err != nil {
 		log.Printf("Failed to write data to the tray app: %s", err)
+		return
 	}
 
 	_ = conn.Close()

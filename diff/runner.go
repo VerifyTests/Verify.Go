@@ -14,7 +14,7 @@ type runner struct {
 	tool       *Tools
 	counter    *instanceCounter
 	proc       *processCleaner
-	client     *tray.Client
+	tray       *tray.Client
 	logger     Logger
 	disabled   bool
 }
@@ -66,7 +66,7 @@ func newRunner(reader EnvReader) *runner {
 		tool:       NewTools(),
 		counter:    newInstanceCounter(reader),
 		proc:       newProcessCleaner(),
-		client:     tray.NewClient(),
+		tray:       tray.NewClient(),
 		logger:     newLogger("runner"),
 	}
 
@@ -99,7 +99,7 @@ func (r *runner) LaunchTool(kind ToolKind, tempFile, targetFile string) LaunchRe
 func (r *runner) innerLaunch(tryResolveTool TryResolveTool, tempFile, targetFile string) LaunchResult {
 	tool, result, exit := r.ShouldExitLaunch(tryResolveTool, targetFile)
 	if exit {
-		//TODO: diff engine tray -> add move
+		r.tray.AddMove(tempFile, targetFile, "", nil, false, -1)
 		return result
 	}
 
@@ -109,7 +109,7 @@ func (r *runner) innerLaunch(tryResolveTool TryResolveTool, tempFile, targetFile
 	processCommand, found := r.proc.GetProcessInfo(cmd)
 	if found {
 		if tool.AutoRefresh {
-			r.client.SendMove(tempFile, targetFile, tool.ExePath, args, canKill, processCommand.Process)
+			r.tray.AddMove(tempFile, targetFile, tool.ExePath, args, canKill, processCommand.Process)
 			return AlreadyRunningAndSupportsRefresh
 		}
 
@@ -117,13 +117,13 @@ func (r *runner) innerLaunch(tryResolveTool TryResolveTool, tempFile, targetFile
 	}
 
 	if r.counter.ReachedMax() {
-		r.client.SendMove(tempFile, targetFile, tool.ExePath, args, canKill, 0)
+		r.tray.AddMove(tempFile, targetFile, tool.ExePath, args, canKill, 0)
 		return TooManyRunningDiffTools
 	}
 
 	processId := r.LaunchProcess(tool, args)
-	r.client.SendMove(tempFile, targetFile, tool.ExePath, args, canKill, processId)
-	
+	r.tray.AddMove(tempFile, targetFile, tool.ExePath, args, canKill, processId)
+
 	return StartedNewInstance
 }
 

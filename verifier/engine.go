@@ -2,6 +2,7 @@ package verifier
 
 import (
 	"github.com/VerifyTests/Verify.Go/diff"
+	"github.com/VerifyTests/Verify.Go/tray"
 	"github.com/VerifyTests/Verify.Go/utils"
 	"strings"
 )
@@ -17,6 +18,7 @@ type engine struct {
 	newFiles            NewFiles
 	notEqualFiles       NotEqualFiles
 	detector            diff.CIDetected
+	tray                *tray.Client
 }
 
 func newEngine(
@@ -37,6 +39,7 @@ func newEngine(
 		notEqualFiles:       NotEqualFiles{},
 		equalFiles:          EqualFiles{},
 		newFiles:            NewFiles{},
+		tray:                tray.NewClient(),
 	}
 }
 
@@ -152,7 +155,9 @@ func (e *engine) processDelete(deletedFile string) {
 		return
 	}
 
-	//TODO: how to implement diff tray?
+	if e.tray.IsRunning() {
+		e.tray.AddDelete(deletedFile)
+	}
 }
 
 func (e *engine) processNew() {

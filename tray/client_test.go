@@ -4,6 +4,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"os"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 )
@@ -29,17 +30,17 @@ func TestClient_SendDeleteAndSendMove_Integration(t *testing.T) {
 	defer server.Stop()
 
 	client := NewClient()
-	client.SendDelete("testFile.txt")
-	client.SendMove("test.received.txt", "test.verified.txt", "", nil, false, 0)
+	client.AddDelete("testFile.txt")
+	client.AddMove("test.received.txt", "test.verified.txt", "", nil, false, 0)
 
 	assert.Eventually(t, func() bool {
 		return deleted != nil &&
-			deleted.File == "testFile.txt"
+			strings.Contains(deleted.File, "testFile.txt")
 	}, 9*time.Second, 3*time.Second)
 
 	assert.Eventually(t, func() bool {
 		return moved != nil &&
-			moved.Temp == "test.received.txt" &&
-			moved.Target == "test.verified.txt"
-	}, 60*time.Second, 3*time.Second)
+			strings.Contains(moved.Temp, "test.received.txt") &&
+			strings.Contains(moved.Target, "test.verified.txt")
+	}, 9*time.Second, 3*time.Second)
 }
