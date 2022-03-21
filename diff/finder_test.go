@@ -87,7 +87,7 @@ func createTestDir(t *testing.T, dir string, time time.Time) {
 	if _, err := os.Stat(dir); err == nil {
 		_ = os.Chtimes(dir, time, time)
 	} else {
-		mke := os.Mkdir(dir, 0700)
+		mke := os.Mkdir(dir, os.ModeSticky|os.ModePerm)
 		if mke != nil {
 			t.Fatalf("should not have errors creating directories: %s", mke)
 		}

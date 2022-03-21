@@ -216,7 +216,7 @@ func (f *Files) FileOrDirectoryExists(path string) (bool, error) {
 // CreateDirectory creates a directory
 func (f *Files) CreateDirectory(directory string) error {
 	if !f.Exists(directory) {
-		return os.Mkdir(directory, 644)
+		return os.Mkdir(directory, os.ModeSticky|os.ModePerm)
 	}
 	return nil
 }
