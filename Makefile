@@ -1,45 +1,33 @@
 $(VERBOSE).SILENT:
 
-verifier-build:
-	echo "Building 'verifier'..."
-	go build ./verifier/*.go
+run-build:
+	echo "Building..."
+	go build ./...
 
-verifier-vet:
-	echo "Vetting 'verifier'..."
-	go vet ./verifier
+run-vet:
+	echo "Vetting..."
+	go vet ./...
 
-verifier-test:
+run-tests:
 	echo "Running unit tests for 'verifier'..."
 	go test -v ./verifier/*.go
+
 	echo "Running api tests for 'verifier'..."
 	go test -v ./api-tests/*.go
 
-diff-build:
-	echo "Building 'diff'..."
-	go build ./diff/*.go
-
-diff-vet:
-	echo "Vetting 'diff'..."
-	go vet ./diff
-
-diff-test:
 	echo "Running unit tests for 'diff'..."
-	go test -v ./diff
+	go test -v ./diff/*.go
 
-diff-integration-test:
-	echo "Running integration tests for 'diff'..."
-	go build -tags=integration ./diff
-	go test -v ./diff -tags=integration
-	
-utils-test:
 	echo "Running unit tests for 'utils'..."
-	go test -v ./utils
+	go test -v ./utils/*.go
 
-verifier-all: verifier-build verifier-vet verifier-test
-diff-all: diff-build diff-vet diff-test
+	echo "Running unit tests for 'tray'..."
+	go test -v ./tray/*.go
 
-build-all: diff-build verifier-build
-vet-all: diff-vet verifier-vet
-unit-test-all: utils-test diff-test verifier-test
+run-integration-test: export RUN_INTEGRATION_TESTS=True
+run-integration-test:
+	echo "Should run integration tests: $$RUN_INTEGRATION_TESTS"
+	echo "Running integration tests..."
+	go test -v ./... -run Integration
 
-all: build-all vet-all unit-test-all
+all: run-build run-vet run-tests

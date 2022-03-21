@@ -1,6 +1,9 @@
 package diff
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/VerifyTests/Verify.Go/utils"
+)
 
 // ResolvedTool contains information about a found diff tool
 type ResolvedTool struct {
@@ -27,8 +30,10 @@ func (r *ResolvedTool) commandAndArguments(tempFile, targetFile string) (argumen
 }
 
 func (r *ResolvedTool) getArguments(tempFile, targetFile string) []string {
+	tmp := utils.File.GetFullPath(tempFile)
+	tgt := utils.File.GetFullPath(targetFile)
 	if position.TargetOnLeft {
-		return r.LeftArguments(tempFile, targetFile)
+		return r.LeftArguments(tmp, tgt)
 	}
-	return r.RightArguments(tempFile, targetFile)
+	return r.RightArguments(tmp, tgt)
 }

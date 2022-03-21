@@ -1,0 +1,4 @@
+{
+    "Type": "Delete",
+    "File": "Foo"
+}

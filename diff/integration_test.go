@@ -1,15 +1,20 @@
-//go:build integration
-// +build integration
-
 package diff
 
 import (
+	"github.com/VerifyTests/Verify.Go/utils"
+	"os"
 	"path/filepath"
+	"strconv"
 	"testing"
 	"time"
 )
 
 func TestFindingProcessByName_Integration(t *testing.T) {
+	runTests, _ := strconv.ParseBool(os.Getenv("RUN_INTEGRATION_TESTS"))
+	if !runTests {
+		t.Skip("Skipping integration tests")
+	}
+
 	env := newTestReader()
 	env.lookup[envDiffEngineDisabled] = "false"
 
@@ -18,8 +23,8 @@ func TestFindingProcessByName_Integration(t *testing.T) {
 	target := filepath.Join("../_testdata", "target.txt")
 	targetPath, _ := filepath.Abs(target)
 
-	file.writeText(temp, "temp file")
-	file.writeText(target, "target file")
+	utils.File.WriteText(temp, "temp file")
+	utils.File.WriteText(target, "target file")
 
 	r := newRunner(env)
 	vs, _ := r.tool.TryFind(VisualStudioCode)
@@ -35,6 +40,11 @@ func TestFindingProcessByName_Integration(t *testing.T) {
 }
 
 func TestToolsInitialization_Integration(t *testing.T) {
+	runTests, _ := strconv.ParseBool(os.Getenv("RUN_INTEGRATION_TESTS"))
+	if !runTests {
+		t.Skip("Skipping integration tests")
+	}
+
 	tool := Tools{}
 	tool.initTools([]ToolKind{VisualStudioCode}, false)
 
