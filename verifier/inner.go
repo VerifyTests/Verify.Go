@@ -162,7 +162,7 @@ func (v *innerVerifier) tryGetToString(target interface{}) (asStringResult, bool
 	}
 
 	typ := reflect2.TypeOf(target)
-	
+
 	if typ.AssignableTo(stringBuilderType) {
 		return stringBuilderToString(target.(strings.Builder))
 	}
@@ -338,13 +338,15 @@ func fileMatch(root, pattern string) ([]string, error) {
 		if matched, err := filepath.Match(pattern, filepath.Base(path)); err != nil {
 			return err
 		} else if matched {
-			matches = append(matches, path)
+			//NOTE: Replace backslash with slash to get paths compatible with the builtin path.go functions
+			matches = append(matches, strings.ReplaceAll(path, "\\", "/"))
 		}
 		return nil
 	})
 	if err != nil {
 		return nil, err
 	}
+
 	return matches, nil
 }
 

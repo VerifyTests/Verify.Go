@@ -125,6 +125,7 @@ func (e *engine) addNotEquals(item FilePair, message string) {
 		Message: message,
 	}
 	e.notEqualFiles = append(e.notEqualFiles, neq)
+	e.deletedFiles = removeStringItem(e.deletedFiles, item.VerifiedPath)
 }
 
 func (e *engine) addEquals(item FilePair) {
