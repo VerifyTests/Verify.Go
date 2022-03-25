@@ -22,6 +22,7 @@ go get github.com/VerifyTests/Verify.Go
 
 Accepting or declining a snapshot file is part of the core workflow of Verify. There are several ways to do this and the approach(s) selected is a personal preference.
 
+ * In the Windows Tray via [DiffEngineTray](https://github.com/VerifyTests/DiffEngine/blob/main/docs/tray.md)
  * Manually making the change in the launched diff tool. Either with a copy paste, or some tools have commands to automate this via a shortcut or a button.
  * Manually on the file system, by renaming the `.received.` file to `.verified.`. This can be automated via a scripted to bulk accept all (by matching a pattern) `.received.` files.
 
@@ -53,7 +54,7 @@ Tests are created using standard Go test functions. A test file named `verify_ap
 
 ```go
 import (
-	"github.com/VerifyTests/Verify.Go/verifier"
+    "github.com/VerifyTests/Verify.Go/verifier"
 )
 
 func TestVerifyingStructs(t *testing.T) {
@@ -115,7 +116,7 @@ var person = Person{
 }
 ```
 
-And the test is re run it will fail.
+And the test is re-run, it will fail.
 
 The Diff Tool will display the diff:
 
