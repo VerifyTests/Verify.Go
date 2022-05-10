@@ -2,7 +2,7 @@ package verify
 
 // Verify.Go is a snapshot tool for Go language that simplifies the assertion of complex data models and documents.
 //
-// testify contains the following packages:
+// The library contains the following packages:
 //
 // The verifier package provides a set of APIs that tie in to the Go testing system and allow snapshot testing.
 //
