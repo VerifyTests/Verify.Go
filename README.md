@@ -1,6 +1,6 @@
 # <img src='./icon.png' height='30px'> Verify.Go
 
-[![Discussions](https://img.shields.io/badge/Verify-Discussions-yellow?svg=true&style=flat-square&label=)](https://github.com/VerifyTests/Discussions/discussions) [![Build Status](https://img.shields.io/github/workflow/status/VerifyTests/Verify.Go/build-pipeline?label=build&logo=github&style=flat-square)](https://github.com/VerifyTests/Verify.Go/actions?query=workflow%3Abuild) [![Go Report Card](https://goreportcard.com/badge/github.com/VerifyTests/Verify.Go?style=flat-square)](https://goreportcard.com/report/github.com/VerifyTests/Verify.Go) [![PkgGoDev](https://img.shields.io/badge/go.dev-docs-007d9c?style=flat-square&logo=go&logoColor=white)](https://pkg.go.dev/github.com/VerifyTests/Verify.Go)
+[![Discussions](https://img.shields.io/badge/Verify-Discussions-yellow?svg=true&style=flat-square&label=)](https://github.com/VerifyTests/Discussions/discussions) [![Build](https://github.com/VerifyTests/Verify.Go/actions/workflows/build.yml/badge.svg)](https://github.com/VerifyTests/Verify.Go/actions/workflows/build.yml) [![Go Report Card](https://goreportcard.com/badge/github.com/VerifyTests/Verify.Go?style=flat-square)](https://goreportcard.com/report/github.com/VerifyTests/Verify.Go) [![PkgGoDev](https://img.shields.io/badge/go.dev-docs-007d9c?style=flat-square&logo=go&logoColor=white)](https://pkg.go.dev/github.com/VerifyTests/Verify.Go)
 
 <!--
 [![GitHub release](https://img.shields.io/github/release/VerifyTests/Verify.Go.svg?style=flat-square)](https://github.com/VerifyTests/Verify.Go/releases/latest)
