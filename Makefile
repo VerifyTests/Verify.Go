@@ -4,6 +4,9 @@ run-build:
 	echo "Building..."
 	go build ./...
 
+run-cleanup:
+	go mod tidy
+
 run-vet:
 	echo "Vetting..."
 	go vet ./...
