@@ -216,7 +216,7 @@ func (f *Files) FileOrDirectoryExists(path string) (bool, error) {
 // CreateDirectory creates a directory
 func (f *Files) CreateDirectory(directory string) error {
 	if !f.Exists(directory) {
-		return os.Mkdir(directory, os.ModeSticky|os.ModePerm)
+		return os.Mkdir(directory, os.ModePerm)
 	}
 	return nil
 }
@@ -255,6 +255,7 @@ func (f *Files) GetFileName(path string) string {
 
 // From https://github.com/sindresorhus/text-extensions/blob/master/text-extensions.json
 // contains list of text file extensions
+//
 //goland:noinspection SpellCheckingInspection
 var textExtensions = []string{
 	"ada",
