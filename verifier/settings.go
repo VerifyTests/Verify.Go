@@ -57,6 +57,7 @@ type VerifySettings interface {
 	ScrubLinesContainingAnyCase(stringToMatch ...string)
 	ScrubLinesContaining(stringToMatch ...string)
 	ScrubInlineGuids()
+	ScrubInlineTime(format string)
 	ScrubLines(fun RemoveLineFunc)
 	ScrubLinesWithReplace(fun ReplaceLineFunc)
 	ScrubEmptyLines()
@@ -245,6 +246,15 @@ func (v *verifySettings) ScrubLinesContaining(stringToMatch ...string) {
 // ScrubInlineGuids scrubs inline UUID values with string types
 func (v *verifySettings) ScrubInlineGuids() {
 	v.instanceScrubbers = append([]InstanceScrubber{v.scrubber.replaceGuids}, v.instanceScrubbers...)
+}
+
+// ScrubInlineTime scrubs inline Time values with string types
+func (v *verifySettings) ScrubInlineTime(format string) {
+	v.instanceScrubbers = append([]InstanceScrubber{
+		func(target string) string {
+			return v.scrubber.replaceTime(format, target)
+		},
+	}, v.instanceScrubbers...)
 }
 
 // ScrubLines scrub target lines with the provided function

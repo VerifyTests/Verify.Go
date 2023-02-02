@@ -3,6 +3,7 @@ package api_tests_test
 import (
 	"github.com/VerifyTests/Verify.Go/verifier"
 	"github.com/google/uuid"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -184,4 +185,26 @@ func TestVerifyMaps(t *testing.T) {
 	}
 
 	verifier.VerifyWithSetting(t, NewTestSettings(), target)
+}
+
+func TestUsingTableTests(t *testing.T) {
+	type test struct {
+		input    interface{}
+		testName string
+	}
+
+	tests := []test{
+		{testName: "guids", input: uuid.New()},
+		{testName: "time", input: time.Now()},
+		{testName: "integers", input: strconv.Itoa(10)},
+	}
+
+	setting := NewTestSettings()
+	setting.ScrubInlineGuids()
+	setting.ScrubInlineTime(time.RFC3339)
+
+	for _, tc := range tests {
+		setting.TestCase(tc.testName)
+		verifier.VerifyWithSetting(t, setting, tc.input)
+	}
 }
