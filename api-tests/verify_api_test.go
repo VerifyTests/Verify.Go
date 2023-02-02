@@ -46,6 +46,7 @@ func (t Title) String() string {
 func NewTestSettings() verifier.VerifySettings {
 	defaultSettings := verifier.NewSettings()
 	defaultSettings.UseDirectory("../_testdata")
+	defaultSettings.DisableDiff()
 	return defaultSettings
 }
 
@@ -206,5 +207,52 @@ func TestUsingTableTests(t *testing.T) {
 	for _, tc := range tests {
 		setting.TestCase(tc.testName)
 		verifier.VerifyWithSetting(t, setting, tc.input)
+	}
+}
+
+func TestUsingTableTestsWithSubTests(t *testing.T) {
+	type test struct {
+		input    interface{}
+		testName string
+	}
+
+	tests := []test{
+		{testName: "guids", input: uuid.New()},
+		{testName: "time", input: time.Now()},
+		{testName: "integers", input: strconv.Itoa(10)},
+	}
+
+	setting := NewTestSettings()
+	setting.ScrubInlineGuids()
+	setting.ScrubInlineTime(time.RFC3339)
+
+	for _, tc := range tests {
+		t.Run(tc.testName, func(t *testing.T) {
+			verifier.VerifyWithSetting(t, setting, tc.input)
+		})
+	}
+}
+
+func TestUsingTableTestsWithSubTestsAndExplicitTestCaseName(t *testing.T) {
+	type test struct {
+		input    interface{}
+		testName string
+	}
+
+	tests := []test{
+		{testName: "with guids", input: uuid.New()},
+		{testName: "with time", input: time.Now()},
+		{testName: "with integers", input: strconv.Itoa(10)},
+	}
+
+	setting := NewTestSettings()
+	setting.ScrubInlineGuids()
+	setting.ScrubInlineTime(time.RFC3339)
+
+	for _, tc := range tests {
+		t.Run(tc.testName, func(t *testing.T) {
+			setting.TestCase("case-" + tc.testName[5:])
+			verifier.VerifyWithSetting(t, setting, tc.input)
+		})
 	}
 }

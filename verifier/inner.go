@@ -43,7 +43,7 @@ type innerVerifier struct {
 
 func newInnerVerifier(t testingT, settings *verifySettings) *innerVerifier {
 	uniqueness := newNamer(settings).getUniqueness()
-	fileName, directory := defaultFileConvention(settings, uniqueness)
+	fileName, directory := defaultFileConvention(t, settings, uniqueness)
 	sourceFileDirectory := filepath.Dir(fileName)
 
 	if len(directory) == 0 {
@@ -217,9 +217,10 @@ func (v *innerVerifier) tryGetPrimitiveToString(target interface{}) (asStringRes
 	return asStringResult{}, false
 }
 
-func defaultFileConvention(settings *verifySettings, uniqueness string) (string, string) {
+func defaultFileConvention(t testingT, settings *verifySettings, uniqueness string) (string, string) {
 	testName, sourceFile, _ := testCallerInfo()
-	name := getTestCaseName(testName, settings.testCase)
+	testNameParts := strings.Split(t.Name(), "/")
+	name := getTestCaseName(testNameParts, testName, settings.testCase)
 	sourceFileWithoutExt := utils.File.GetFileNameWithoutExtension(sourceFile)
 
 	if len(settings.directory) == 0 {
@@ -227,7 +228,7 @@ func defaultFileConvention(settings *verifySettings, uniqueness string) (string,
 	}
 
 	if len(uniqueness) > 0 {
-		return fmt.Sprintf("%s.%s%s", sourceFileWithoutExt, name, uniqueness), settings.directory
+		return fmt.Sprintf("%s.%s.%s", sourceFileWithoutExt, name, uniqueness), settings.directory
 	}
 
 	return fmt.Sprintf("%s.%s", sourceFileWithoutExt, name), settings.directory
@@ -245,26 +246,36 @@ func getIndexFileNamePair(filePathPrefix string) getIndexedFileNamesFunc {
 	}
 }
 
-func getTestCaseName(testName, caseName string) string {
-	test := getTestName(testName)
-	if len(caseName) == 0 {
+func getTestCaseName(parts []string, testName, caseName string) string {
+	test := removeTestPrefix(testName)
+
+	//test case is not specified, but can be
+	//determined, based on the table test-case name
+	if len(parts) == 2 && len(caseName) == 0 {
+		caseName = parts[1]
+	}
+
+	if len(test) == 0 && len(caseName) > 0 {
+		return caseName
+	}
+
+	if len(caseName) == 0 && len(test) > 0 {
 		return test
 	}
-	return fmt.Sprintf("%s.%s", test, caseName)
+
+	if len(test) > 0 && len(caseName) > 0 {
+		return fmt.Sprintf("%s.%s", test, caseName)
+	}
+
+	panic("Test name can't be determined. Provide the name via settings.TestCase method.")
 }
 
-func getTestName(testName string) string {
-	last := strings.LastIndexAny(testName, ".")
-	if last == -1 {
+func removeTestPrefix(testName string) string {
+	if strings.HasPrefix(testName, "Test") { // remove 'Test' convention prefix from test name
+		var testName = testName[4:]
 		return testName
 	}
-
-	testCaseName := testName[last+1:]
-	if strings.HasPrefix(testCaseName, "Test") { // remove 'Test' convention prefix from test name
-		var testName = testCaseName[4:]
-		return testName
-	}
-	return testCaseName
+	return testName
 }
 
 func testCallerInfo() (functionName string, filePath string, line int) {
@@ -303,13 +314,33 @@ func testCallerInfo() (functionName string, filePath string, line int) {
 		}
 
 		segments := strings.Split(name, ".")
-		name = segments[len(segments)-1]
-		if isTest(name, "Test") ||
-			isTest(name, "Benchmark") ||
-			isTest(name, "Example") {
-			functionName = name
-			filePath = file
-			return
+
+		//test names are usually the last part of the
+		//fully qualified test name and start with a set of
+		//well-known prefixes
+		if len(segments)-1 >= 0 {
+			potentialTestName := segments[len(segments)-1]
+			if isTest(potentialTestName, "Test") ||
+				isTest(potentialTestName, "Benchmark") ||
+				isTest(potentialTestName, "Example") {
+				functionName = potentialTestName
+				filePath = file
+				return
+			}
+		}
+
+		//Table test name have an inner function where
+		//the actual test name is not the last part of the
+		//full method name, but prior to last
+		if len(segments)-2 >= 0 {
+			tableTestName := segments[len(segments)-2]
+			if isTest(tableTestName, "Test") ||
+				isTest(tableTestName, "Benchmark") ||
+				isTest(tableTestName, "Example") {
+				functionName = tableTestName
+				filePath = file
+				return
+			}
 		}
 	}
 	return

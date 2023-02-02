@@ -94,13 +94,17 @@ func (e *engine) newErrorBuilder() failingMessageBuilder {
 	return failingMessageBuilder{
 		settings:      e.settings,
 		testCase:      e.settings.testCase,
-		testName:      e.testing.Name(),
+		testName:      normalizeTestName(e.testing.Name()),
 		directory:     e.directory,
 		notEqualFiles: e.notEqualFiles,
 		equalFiles:    e.equalFiles,
 		newFiles:      e.newFiles,
 		delete:        e.deletedFiles,
 	}
+}
+
+func normalizeTestName(testName string) string {
+	return strings.ReplaceAll(testName, "/", "_")
 }
 
 func (e *engine) handleCompareResult(compareResult EqualityResult, file FilePair) {
