@@ -124,7 +124,7 @@ func (v *verifySettings) OmitContentFromError() {
 
 // DisableDiff enables the diff tools
 func (v *verifySettings) DisableDiff() {
-	v.diffDisabled = false
+	v.diffDisabled = true
 }
 
 // UseStrictJSON use .json extension for the outputted files
