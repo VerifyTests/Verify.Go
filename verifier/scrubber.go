@@ -184,6 +184,13 @@ func (s *dataScrubber) replaceGuids(input string) string {
 	return input
 }
 
+func (s *dataScrubber) replaceTime(format, input string) string {
+	if result, err := time.Parse(format, input); err == nil {
+		return s.ScrubTime(result)
+	}
+	return input
+}
+
 func (s *dataScrubber) tryReplaceGuids(value string) (string, bool) {
 
 	if id, err := uuid.Parse(value); err == nil {
