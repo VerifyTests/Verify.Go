@@ -29,12 +29,16 @@ func (d *Client) IsRunning() bool {
 
 // AddDelete sends delete information to the server
 func (d *Client) AddDelete(file string) {
-	d.sendDelete(file)
+	if d.IsRunning() {
+		d.sendDelete(file)
+	}
 }
 
 // AddMove sends move information to the server
 func (d *Client) AddMove(tempFile, targetFile, exe string, arguments []string, canKill bool, processId int32) {
-	d.sendMove(tempFile, targetFile, exe, arguments, canKill, processId)
+	if d.IsRunning() {
+		d.sendMove(tempFile, targetFile, exe, arguments, canKill, processId)
+	}
 }
 
 func (d *Client) sendDelete(file string) {

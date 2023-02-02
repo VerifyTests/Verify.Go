@@ -38,12 +38,10 @@ func TestStringConversion(t *testing.T) {
 		"float64":    float64(11.0),
 	}
 
-	settings := verifier.NewSettings()
-	settings.UseDirectory("../_testdata")
+	ver := verifier.NewVerifier(t, verifier.UseDirectory("../_testdata"))
 
 	for k, v := range testCases {
-
-		settings.TestCase(k)
-		verifier.VerifyWithSetting(t, settings, v)
+		ver = ver.Configure(verifier.TestCase(k))
+		ver.Verify(v)
 	}
 }

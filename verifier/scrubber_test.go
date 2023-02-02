@@ -106,7 +106,7 @@ func TestScrubber_CurrentDirectory(t *testing.T) {
 
 	scrubber := newDataScrubber(startCounter())
 
-	scrubber.Apply("txt", &builder, newSettings())
+	scrubber.Apply("txt", &builder, newSettings(t))
 
 	output := builder.String()
 

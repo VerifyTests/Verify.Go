@@ -41,7 +41,7 @@ type innerVerifier struct {
 	receivedFiles       []string
 }
 
-func newInnerVerifier(t testingT, settings *verifySettings) *innerVerifier {
+func createInnerVerifier(t testingT, settings *verifySettings) *innerVerifier {
 	uniqueness := newNamer(settings).getUniqueness()
 	fileName, directory := defaultFileConvention(t, settings, uniqueness)
 	sourceFileDirectory := filepath.Dir(fileName)
@@ -84,8 +84,8 @@ func newInnerVerifier(t testingT, settings *verifySettings) *innerVerifier {
 	return verifier
 }
 
-func (v *innerVerifier) verifyInner(target interface{}, cleanup CleanupFunc, targets []Target) {
-	if builder, extension, found := v.tryGetTargetBuilder(target); found {
+func (v *innerVerifier) verifyInner(data interface{}, cleanup CleanupFunc, targets []Target) {
+	if builder, extension, found := v.tryGetTargetBuilder(data); found {
 		v.scrubber.Apply(extension, builder, v.settings)
 
 		received := builder.String()
@@ -106,16 +106,11 @@ func (v *innerVerifier) verifyInner(target interface{}, cleanup CleanupFunc, tar
 	engine.throwIfRequired()
 }
 
-// verifyStream verifies a target of type []byte
-func (v *innerVerifier) verifyStream(target []byte) {
-	panic("not implemented")
-}
-
-func (v *innerVerifier) tryGetTargetBuilder(target interface{}) (builder *strings.Builder, extension string, found bool) {
+func (v *innerVerifier) tryGetTargetBuilder(root interface{}) (builder *strings.Builder, extension string, found bool) {
 	appenders := v.settings.getJSONAppenders()
 	hasAppends := len(appenders) > 0
 
-	if target == nil {
+	if root == nil {
 		if !hasAppends {
 			builder = nil
 			extension = emptyExtension
@@ -128,13 +123,13 @@ func (v *innerVerifier) tryGetTargetBuilder(target interface{}) (builder *string
 			extension = jsonExtension
 		}
 
-		builder = asJSON(target, appenders, v.settings)
+		builder = asJSON(root, appenders, v.settings)
 		found = true
 		return
 	}
 
 	if !hasAppends {
-		if stringTarget, ok := target.(string); ok {
+		if stringTarget, ok := root.(string); ok {
 			b := strings.Builder{}
 			b.WriteString(fixNewlines(stringTarget))
 			extension = v.settings.extensionOrTxt()
@@ -149,7 +144,7 @@ func (v *innerVerifier) tryGetTargetBuilder(target interface{}) (builder *string
 		extension = jsonExtension
 	}
 
-	builder = asJSON(target, appenders, v.settings)
+	builder = asJSON(root, appenders, v.settings)
 	found = true
 	return
 }
@@ -415,7 +410,7 @@ func validatePrefix(prefix string) {
 		if f == prefix {
 			panic(fmt.Sprintf("The prefix has already been used: %s.\n"+
 				"This is mostly caused by a conflicting combination of "+
-				"`VerifySettings.UseDirectory()`, `VerifySettings.TestCase(), and `VerifySettings.TestName()`.\n"+
+				"`verifier.UseDirectory()`, `verifier.TestCase(), and `verifier.TestName()`.\n"+
 				"If that's not the case, and having multiple identical prefixes is acceptable, then call `VerifierSettings.DisableRequireUniquePrefix()` "+
 				"to disable this uniqueness validation.", prefix))
 		}

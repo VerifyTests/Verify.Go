@@ -37,120 +37,297 @@ type verifySettings struct {
 	onFirstVerify                    FirstVerifyFunc
 	onVerifyMismatch                 VerifyMismatchFunc
 	onVerifyDelete                   VerifyDeleteFunc
+	t                                testingT
 }
 
-// VerifySettings provides customization for the Verify process.
-type VerifySettings interface {
-	AutoVerify()
-	DisableDiff()
-	UseStrictJSON()
-	DontScrubGuids()
-	DontScrubTimes()
-	UniqueForArchitecture()
-	UniqueForOperatingSystem()
-	UniqueForRuntime()
-	UseDirectory(directory string)
-	UseExtension(extension string)
-	ScrubMachineName()
-	AddScrubber(fun InstanceScrubber)
-	AddScrubberForExtension(extension string, fun InstanceScrubber)
-	ScrubLinesContainingAnyCase(stringToMatch ...string)
-	ScrubLinesContaining(stringToMatch ...string)
-	ScrubInlineGuids()
-	ScrubInlineTime(format string)
-	ScrubLines(fun RemoveLineFunc)
-	ScrubLinesWithReplace(fun ReplaceLineFunc)
-	ScrubEmptyLines()
-	UseStreamComparer(fun StreamComparerFunc)
-	UseStringComparer(fun StringComparerFunc)
-	OnAfterVerify(fun AfterVerifyFunc)
-	OnBeforeVerify(fun BeforeVerifyFunc)
-	OnFirstVerify(fun FirstVerifyFunc)
-	OnVerifyMismatch(fun VerifyMismatchFunc)
-	OnVerifyDelete(fun VerifyDeleteFunc)
-	OmitContentFromError()
-	TestCase(name string)
-}
+type VerifyConfigure = func(settings *verifySettings)
 
 // OnVerifyDelete callback that is executed before a file is deleted
-func (v *verifySettings) OnVerifyDelete(fun VerifyDeleteFunc) {
-	v.onVerifyDelete = fun
+func OnVerifyDelete(fun VerifyDeleteFunc) VerifyConfigure {
+	return func(s *verifySettings) {
+		s.onVerifyDelete = fun
+	}
 }
 
 // OnAfterVerify callback that is executed after the verify process
-func (v *verifySettings) OnAfterVerify(fun AfterVerifyFunc) {
-	v.onAfterVerify = fun
+func OnAfterVerify(fun AfterVerifyFunc) VerifyConfigure {
+	return func(s *verifySettings) {
+		s.onAfterVerify = fun
+	}
 }
 
 // OnBeforeVerify callback that is executed before the verify process
-func (v *verifySettings) OnBeforeVerify(fun BeforeVerifyFunc) {
-	v.onBeforeVerify = fun
+func OnBeforeVerify(fun BeforeVerifyFunc) VerifyConfigure {
+	return func(s *verifySettings) {
+		s.onBeforeVerify = fun
+	}
 }
 
 // OnFirstVerify callback that is executed on the first verify
-func (v *verifySettings) OnFirstVerify(fun FirstVerifyFunc) {
-	v.onFirstVerify = fun
+func OnFirstVerify(fun FirstVerifyFunc) VerifyConfigure {
+	return func(s *verifySettings) {
+		s.onFirstVerify = fun
+	}
 }
 
 // OnVerifyMismatch callback that is executed when a mismatch happens
-func (v *verifySettings) OnVerifyMismatch(fun VerifyMismatchFunc) {
-	v.onVerifyMismatch = fun
+func OnVerifyMismatch(fun VerifyMismatchFunc) VerifyConfigure {
+	return func(s *verifySettings) {
+		s.onVerifyMismatch = fun
+	}
 }
 
 // AutoVerify automatically accepts the received files
-func (v *verifySettings) AutoVerify() {
-	v.autoVerify = true
+func AutoVerify() VerifyConfigure {
+	return func(s *verifySettings) {
+		s.autoVerify = true
+	}
 }
 
 // UniqueForArchitecture create file names based on the runtime architecture
-func (v *verifySettings) UniqueForArchitecture() {
-	v.uniqueForArchitecture = true
+func UniqueForArchitecture() VerifyConfigure {
+	return func(s *verifySettings) {
+		s.uniqueForArchitecture = true
+	}
 }
 
 // UniqueForOperatingSystem create file names based on the runtime operating system
-func (v *verifySettings) UniqueForOperatingSystem() {
-	v.uniqueForOperatingSystem = true
+func UniqueForOperatingSystem() VerifyConfigure {
+	return func(s *verifySettings) {
+		s.uniqueForOperatingSystem = true
+	}
 }
 
 // UniqueForRuntime create file names based on the Go runtime versions
-func (v *verifySettings) UniqueForRuntime() {
-	v.uniqueForRuntime = true
+func UniqueForRuntime() VerifyConfigure {
+	return func(s *verifySettings) {
+		s.uniqueForRuntime = true
+	}
 }
 
 // OmitContentFromError show the content differences when a mismatch occurs during verification
-func (v *verifySettings) OmitContentFromError() {
-	v.omitContentFromError = true
+func OmitContentFromError() VerifyConfigure {
+	return func(s *verifySettings) {
+		s.omitContentFromError = true
+	}
 }
 
 // DisableDiff enables the diff tools
-func (v *verifySettings) DisableDiff() {
-	v.diffDisabled = true
+func DisableDiff() VerifyConfigure {
+	return func(s *verifySettings) {
+		s.diffDisabled = true
+	}
 }
 
 // UseStrictJSON use .json extension for the outputted files
-func (v *verifySettings) UseStrictJSON() {
-	v.strictJSON = true
+func UseStrictJSON() VerifyConfigure {
+	return func(s *verifySettings) {
+		s.strictJSON = true
+	}
 }
 
 // DontScrubGuids do not auto-scrub UUID values
-func (v *verifySettings) DontScrubGuids() {
-	v.scrubGuids = false
+func DontScrubGuids() VerifyConfigure {
+	return func(s *verifySettings) {
+		s.scrubGuids = false
+	}
 }
 
 // DontScrubTimes do not auto-scrub time.Time values
-func (v *verifySettings) DontScrubTimes() {
-	v.scrubTimes = false
+func DontScrubTimes() VerifyConfigure {
+	return func(s *verifySettings) {
+		s.scrubTimes = false
+	}
 }
 
 // UseExtension specify an extension to use for the outputted files
-func (v *verifySettings) UseExtension(extension string) {
-	utils.Guard.AgainstBadExtension(extension)
-	v.extension = extension
+func UseExtension(extension string) VerifyConfigure {
+	return func(s *verifySettings) {
+		utils.Guard.AgainstBadExtension(extension)
+		s.extension = extension
+	}
 }
 
-func (v *verifySettings) getJSONAppenders() []toAppend {
+// UseStreamComparer use the specified function for stream comparison
+func UseStreamComparer(fun StreamComparerFunc) VerifyConfigure {
+	return func(s *verifySettings) {
+		s.streamComparer = fun
+	}
+}
+
+// UseStringComparer use the specified function for string comparison
+func UseStringComparer(fun StringComparerFunc) VerifyConfigure {
+	return func(s *verifySettings) {
+		s.stringComparer = fun
+	}
+}
+
+// UseDirectory place the output files in the specified directory
+func UseDirectory(directory string) VerifyConfigure {
+	return func(s *verifySettings) {
+		s.directory = directory
+	}
+}
+
+// AddScrubber add a function to the front of the scrubber collections.
+func AddScrubber(fun InstanceScrubber) VerifyConfigure {
+	return func(s *verifySettings) {
+		s.instanceScrubbers = append(s.instanceScrubbers, fun)
+	}
+}
+
+// ScrubMachineName scrubs the machine name from the target data
+func ScrubMachineName() VerifyConfigure {
+	return func(s *verifySettings) {
+		s.instanceScrubbers = append(s.instanceScrubbers, s.scrubber.ScrubMachineName)
+	}
+}
+
+// AddScrubberForExtension adds a function for a specified extension to the front of the scrubber collection.
+func AddScrubberForExtension(extension string, fun InstanceScrubber) VerifyConfigure {
+	return func(s *verifySettings) {
+		current, found := s.extensionMappedInstanceScrubbers[extension]
+		if !found {
+			list := make([]InstanceScrubber, 0)
+			list = append(list, fun)
+			s.extensionMappedInstanceScrubbers[extension] = list
+		} else {
+			s.extensionMappedInstanceScrubbers[extension] = append([]InstanceScrubber{fun}, current...)
+		}
+	}
+}
+
+// ScrubLinesContainingAnyCase scrubs strings that match the data in the target
+func ScrubLinesContainingAnyCase(stringToMatch ...string) VerifyConfigure {
+	return func(s *verifySettings) {
+		removeLines := func(target string) string {
+			return s.scrubber.removeLinesContaining(target, true, stringToMatch...)
+		}
+		s.instanceScrubbers = append([]InstanceScrubber{removeLines}, s.instanceScrubbers...)
+	}
+}
+
+// ScrubLinesContaining scrubs the line containing specified strings
+func ScrubLinesContaining(stringToMatch ...string) VerifyConfigure {
+	return func(s *verifySettings) {
+		removeLines := func(target string) string {
+			return s.scrubber.removeLinesContaining(target, false, stringToMatch...)
+		}
+		s.instanceScrubbers = append([]InstanceScrubber{removeLines}, s.instanceScrubbers...)
+	}
+}
+
+// ScrubInlineGuids scrubs inline UUID values with string types
+func ScrubInlineGuids() VerifyConfigure {
+	return func(s *verifySettings) {
+		s.instanceScrubbers = append([]InstanceScrubber{s.scrubber.replaceGuids}, s.instanceScrubbers...)
+	}
+}
+
+// ScrubInlineTime scrubs inline Time values with string types
+func ScrubInlineTime(format string) VerifyConfigure {
+	return func(s *verifySettings) {
+		s.instanceScrubbers = append([]InstanceScrubber{
+			func(target string) string {
+				return s.scrubber.replaceTime(format, target)
+			},
+		}, s.instanceScrubbers...)
+	}
+}
+
+// ScrubLines scrub target lines with the provided function
+func ScrubLines(fun RemoveLineFunc) VerifyConfigure {
+	return func(s *verifySettings) {
+		filterLines := func(input string) string {
+			return s.scrubber.filterLines(input, fun)
+		}
+		s.instanceScrubbers = append([]InstanceScrubber{filterLines}, s.instanceScrubbers...)
+	}
+}
+
+// ScrubLinesWithReplace scrubs target lines and replace with the value provided by the function
+func ScrubLinesWithReplace(fun ReplaceLineFunc) VerifyConfigure {
+	return func(s *verifySettings) {
+		filterLines := func(input string) string {
+			return s.scrubber.replaceLines(input, fun)
+		}
+		s.instanceScrubbers = append([]InstanceScrubber{filterLines}, s.instanceScrubbers...)
+	}
+}
+
+// ScrubEmptyLines scrubs all the empty lines from the target
+func ScrubEmptyLines() VerifyConfigure {
+	return func(s *verifySettings) {
+		isNullOrWhitespace := func(line string) bool {
+			return len(line) == 0 || strings.TrimSpace(line) == ""
+		}
+		filterLines := func(input string) string {
+			return s.scrubber.filterLines(input, isNullOrWhitespace)
+		}
+		s.instanceScrubbers = append([]InstanceScrubber{filterLines}, s.instanceScrubbers...)
+	}
+}
+
+// TestCase specify a case name for the test.
+func TestCase(name string) VerifyConfigure {
+	return func(s *verifySettings) {
+		s.testCase = name
+	}
+}
+
+func (s *verifySettings) tryGetStringComparer(extension string) (StringComparerFunc, bool) {
+	comp, ok := s.stringComparers[extension]
+	if ok {
+		return comp, true
+	}
+
+	if s.defaultStringComparer != nil {
+		return s.defaultStringComparer, true
+	}
+
+	return nil, false
+}
+
+func (s *verifySettings) extensionOrTxt() string {
+	if len(s.extension) == 0 {
+		return textExtension
+	}
+	return s.extension
+}
+
+func (s *verifySettings) runOnFirstVerify(file FilePair) {
+	if s.onFirstVerify != nil {
+		s.onFirstVerify(file)
+	}
+}
+
+func (s *verifySettings) runAfterVerify() {
+	if s.onAfterVerify != nil {
+		s.onAfterVerify()
+	}
+}
+
+func (s *verifySettings) runBeforeVerify() {
+	if s.onBeforeVerify != nil {
+		s.onBeforeVerify()
+	}
+}
+
+func (s *verifySettings) runOnVerifyMismatch(file FilePair, message string) {
+	if s.onVerifyMismatch != nil {
+		s.onVerifyMismatch(file, message)
+	}
+}
+
+func (s *verifySettings) runOnVerifyDelete(file string) {
+	if s.onVerifyMismatch != nil {
+		s.onVerifyDelete(file)
+	}
+}
+
+func (s *verifySettings) getJSONAppenders() []toAppend {
 	result := make([]toAppend, 0)
-	for _, appender := range v.jsonAppender {
+	for _, appender := range s.jsonAppender {
 		data := appender()
 		if data != nil {
 			result = append(result, *data)
@@ -159,9 +336,9 @@ func (v *verifySettings) getJSONAppenders() []toAppend {
 	return result
 }
 
-func (v *verifySettings) getFileAppenders() []Target {
+func (s *verifySettings) getFileAppenders() []Target {
 	result := make([]Target, 0)
-	for _, appender := range v.fileAppender {
+	for _, appender := range s.fileAppender {
 		stream := appender()
 		if stream != nil {
 			result = append(result, *stream)
@@ -170,161 +347,7 @@ func (v *verifySettings) getFileAppenders() []Target {
 	return result
 }
 
-// UseStreamComparer use the specified function for stream comparison
-func (v *verifySettings) UseStreamComparer(fun StreamComparerFunc) {
-	v.streamComparer = fun
-}
-
-// UseStringComparer use the specified function for string comparison
-func (v *verifySettings) UseStringComparer(fun StringComparerFunc) {
-	v.stringComparer = fun
-}
-
-func (v *verifySettings) tryGetStringComparer(extension string) (StringComparerFunc, bool) {
-	comp, ok := v.stringComparers[extension]
-	if ok {
-		return comp, true
-	}
-
-	if v.defaultStringComparer != nil {
-		return v.defaultStringComparer, true
-	}
-
-	return nil, false
-}
-
-// UseDirectory place the output files in the specified directory
-func (v *verifySettings) UseDirectory(directory string) {
-	v.directory = directory
-}
-
-func (v *verifySettings) extensionOrTxt() string {
-	if len(v.extension) == 0 {
-		return textExtension
-	}
-	return v.extension
-}
-
-// ScrubMachineName scrubs the machine name from the target data
-func (v *verifySettings) ScrubMachineName() {
-	v.AddScrubber(v.scrubber.ScrubMachineName)
-}
-
-// AddScrubber add a function to the front of the scrubber collections.
-func (v *verifySettings) AddScrubber(fun InstanceScrubber) {
-	v.instanceScrubbers = append(v.instanceScrubbers, fun)
-}
-
-// AddScrubberForExtension adds a function for a specified extension to the front of the scrubber collection.
-func (v *verifySettings) AddScrubberForExtension(extension string, fun InstanceScrubber) {
-	current, found := v.extensionMappedInstanceScrubbers[extension]
-	if !found {
-		list := make([]InstanceScrubber, 0)
-		list = append(list, fun)
-		v.extensionMappedInstanceScrubbers[extension] = list
-	} else {
-		v.extensionMappedInstanceScrubbers[extension] = append([]InstanceScrubber{fun}, current...)
-	}
-}
-
-// ScrubLinesContainingAnyCase scrubs strings that match the data in the target
-func (v *verifySettings) ScrubLinesContainingAnyCase(stringToMatch ...string) {
-	removeLines := func(target string) string {
-		return v.scrubber.removeLinesContaining(target, true, stringToMatch...)
-	}
-	v.instanceScrubbers = append([]InstanceScrubber{removeLines}, v.instanceScrubbers...)
-}
-
-// ScrubLinesContaining scrubs the line containing specified strings
-func (v *verifySettings) ScrubLinesContaining(stringToMatch ...string) {
-	removeLines := func(target string) string {
-		return v.scrubber.removeLinesContaining(target, false, stringToMatch...)
-	}
-	v.instanceScrubbers = append([]InstanceScrubber{removeLines}, v.instanceScrubbers...)
-}
-
-// ScrubInlineGuids scrubs inline UUID values with string types
-func (v *verifySettings) ScrubInlineGuids() {
-	v.instanceScrubbers = append([]InstanceScrubber{v.scrubber.replaceGuids}, v.instanceScrubbers...)
-}
-
-// ScrubInlineTime scrubs inline Time values with string types
-func (v *verifySettings) ScrubInlineTime(format string) {
-	v.instanceScrubbers = append([]InstanceScrubber{
-		func(target string) string {
-			return v.scrubber.replaceTime(format, target)
-		},
-	}, v.instanceScrubbers...)
-}
-
-// ScrubLines scrub target lines with the provided function
-func (v *verifySettings) ScrubLines(fun RemoveLineFunc) {
-	filterLines := func(input string) string {
-		return v.scrubber.filterLines(input, fun)
-	}
-	v.instanceScrubbers = append([]InstanceScrubber{filterLines}, v.instanceScrubbers...)
-}
-
-// ScrubLinesWithReplace scrubs target lines and replace with the value provided by the function
-func (v *verifySettings) ScrubLinesWithReplace(fun ReplaceLineFunc) {
-	filterLines := func(input string) string {
-		return v.scrubber.replaceLines(input, fun)
-	}
-	v.instanceScrubbers = append([]InstanceScrubber{filterLines}, v.instanceScrubbers...)
-}
-
-// ScrubEmptyLines scrubs all the empty lines from the target
-func (v *verifySettings) ScrubEmptyLines() {
-	isNullOrWhitespace := func(line string) bool {
-		return len(line) == 0 || strings.TrimSpace(line) == ""
-	}
-	filterLines := func(input string) string {
-		return v.scrubber.filterLines(input, isNullOrWhitespace)
-	}
-	v.instanceScrubbers = append([]InstanceScrubber{filterLines}, v.instanceScrubbers...)
-}
-
-// TestCase specify a case name for the test.
-func (v *verifySettings) TestCase(name string) {
-	v.testCase = name
-}
-
-func (v *verifySettings) runOnFirstVerify(file FilePair) {
-	if v.onFirstVerify != nil {
-		v.onFirstVerify(file)
-	}
-}
-
-func (v *verifySettings) runAfterVerify() {
-	if v.onAfterVerify != nil {
-		v.onAfterVerify()
-	}
-}
-
-func (v *verifySettings) runBeforeVerify() {
-	if v.onBeforeVerify != nil {
-		v.onBeforeVerify()
-	}
-}
-
-func (v *verifySettings) runOnVerifyMismatch(file FilePair, message string) {
-	if v.onVerifyMismatch != nil {
-		v.onVerifyMismatch(file, message)
-	}
-}
-
-func (v *verifySettings) runOnVerifyDelete(file string) {
-	if v.onVerifyMismatch != nil {
-		v.onVerifyDelete(file)
-	}
-}
-
-// NewSettings returns a new default instance of the VerifySettings
-func NewSettings() VerifySettings {
-	return newSettings()
-}
-
-func newSettings() *verifySettings {
+func newSettings(t testingT) *verifySettings {
 	return &verifySettings{
 		scrubGuids:                       true,
 		scrubTimes:                       true,
@@ -338,5 +361,6 @@ func newSettings() *verifySettings {
 		ciDetected:                       diff.CheckCI(),
 		diffDisabled:                     diff.CheckDisabled(),
 		autoVerify:                       false,
+		t:                                t,
 	}
 }

@@ -43,21 +43,24 @@ func (t Title) String() string {
 	return "Undefined Title"
 }
 
-func NewTestSettings() verifier.VerifySettings {
-	defaultSettings := verifier.NewSettings()
-	defaultSettings.UseDirectory("../_testdata")
-	defaultSettings.DisableDiff()
-	return defaultSettings
+func DefaultTestConfiguration() []verifier.VerifyConfigure {
+	return []verifier.VerifyConfigure{
+		verifier.UseDirectory("../_testdata"),
+		verifier.DisableDiff(),
+	}
+}
+
+func NewTestVerifier(t *testing.T) verifier.Verifier {
+	cfg := DefaultTestConfiguration()
+	return verifier.NewVerifier(t).Configure(cfg...)
 }
 
 func TestVerifyingNilObject(t *testing.T) {
-	verifier.VerifyWithSetting(t, NewTestSettings(), nil)
+	NewTestVerifier(t).Verify(nil)
 }
 
 func TestSimpleString(t *testing.T) {
-	settings := NewTestSettings()
-	settings.DisableDiff()
-	verifier.VerifyWithSetting(t, settings, "Foo")
+	NewTestVerifier(t).Verify("Foo")
 }
 
 func TestVerifyingStructs(t *testing.T) {
@@ -75,32 +78,32 @@ func TestVerifyingStructs(t *testing.T) {
 		},
 		Children: []string{"Sam", "Mary"},
 	}
-	verifier.VerifyWithSetting(t, NewTestSettings(), person)
+	NewTestVerifier(t).Verify(person)
 }
 
 func TestVerifyingNullableStructs(t *testing.T) {
 	address := &Address{
 		Street: "Test Street",
 	}
-	verifier.VerifyWithSetting(t, NewTestSettings(), address)
+	NewTestVerifier(t).Verify(address)
 }
 
 func TestVerifyingMultiLineStrings(t *testing.T) {
-	settings := NewTestSettings()
+	v := NewTestVerifier(t).Configure(
+		verifier.ScrubLinesWithReplace(func(line string) string {
+			if strings.Contains(line, "LineE") {
+				return "NoMoreLineE"
+			}
+			return line
+		}),
+		verifier.ScrubLines(func(line string) bool {
+			return strings.Contains(line, "J")
+		}),
+		verifier.ScrubLinesContaining("b", "D"),
+		verifier.ScrubLinesContainingAnyCase("h"),
+	)
 
-	settings.ScrubLinesWithReplace(func(line string) string {
-		if strings.Contains(line, "LineE") {
-			return "NoMoreLineE"
-		}
-		return line
-	})
-	settings.ScrubLines(func(line string) bool {
-		return strings.Contains(line, "J")
-	})
-	settings.ScrubLinesContaining("b", "D")
-	settings.ScrubLinesContainingAnyCase("h")
-
-	verifier.VerifyWithSetting(t, settings, "LineA\nLineB\nLineC\nLineD\nLineE\nLineF\nLineG\nLineH\nLineI\nLineJ")
+	v.Verify("LineA\nLineB\nLineC\nLineD\nLineE\nLineF\nLineG\nLineH\nLineI\nLineJ")
 }
 
 type ToBeScrubbed struct {
@@ -112,12 +115,12 @@ func TestScrubbingAfterMarshalling(t *testing.T) {
 		RowVersion: "7D3",
 	}
 
-	settings := NewTestSettings()
-	settings.AddScrubber(func(target string) string {
-		return strings.Replace(target, "7D3", "TheRowVersion", 1)
-	})
+	v := NewTestVerifier(t).Configure(
+		verifier.AddScrubber(func(target string) string {
+			return strings.Replace(target, "7D3", "TheRowVersion", 1)
+		}))
 
-	verifier.VerifyWithSetting(t, settings, target)
+	v.Verify(target)
 }
 
 type nonPublic struct {
@@ -126,7 +129,7 @@ type nonPublic struct {
 
 func TestVerifyingPrivateStructs(t *testing.T) {
 	target := nonPublic{}
-	verifier.VerifyWithSetting(t, NewTestSettings(), target)
+	NewTestVerifier(t).Verify(target)
 }
 
 func TestRemovingEmptyLines(t *testing.T) {
@@ -134,16 +137,16 @@ func TestRemovingEmptyLines(t *testing.T) {
 LineA
 
 LineC`
-	settings := NewTestSettings()
-	settings.ScrubEmptyLines()
-	verifier.VerifyWithSetting(t, settings, target)
+
+	v := NewTestVerifier(t).Configure(verifier.ScrubEmptyLines())
+	v.Verify(target)
 }
 
 func TestVerifySlicesOfStructs(t *testing.T) {
 	persons := []uuid.UUID{
 		uuid.New(), uuid.New(),
 	}
-	verifier.VerifyWithSetting(t, NewTestSettings(), persons)
+	NewTestVerifier(t).Verify(persons)
 }
 
 func TestVerifyArrayOfStructs(t *testing.T) {
@@ -152,7 +155,7 @@ func TestVerifyArrayOfStructs(t *testing.T) {
 		{GivenNames: "Jill", Title: Mrs},
 	}
 
-	verifier.VerifyWithSetting(t, NewTestSettings(), persons)
+	NewTestVerifier(t).Verify(persons)
 }
 
 func TestVerifySliceOfTime(t *testing.T) {
@@ -161,7 +164,7 @@ func TestVerifySliceOfTime(t *testing.T) {
 		time.Date(2021, 01, 02, 1, 2, 3, 4, time.Local),
 	}
 
-	verifier.VerifyWithSetting(t, NewTestSettings(), times)
+	NewTestVerifier(t).Verify(times)
 }
 
 func TestVerifySliceOfStrings(t *testing.T) {
@@ -171,7 +174,7 @@ func TestVerifySliceOfStrings(t *testing.T) {
 		uuid.NewString(),
 	}
 
-	verifier.VerifyWithSetting(t, NewTestSettings(), times)
+	NewTestVerifier(t).Verify(times)
 }
 
 func TestVerifyMaps(t *testing.T) {
@@ -185,7 +188,7 @@ func TestVerifyMaps(t *testing.T) {
 		"FifthTimeString":  current.Format(time.RFC3339),
 	}
 
-	verifier.VerifyWithSetting(t, NewTestSettings(), target)
+	NewTestVerifier(t).Verify(target)
 }
 
 func TestUsingTableTests(t *testing.T) {
@@ -200,13 +203,13 @@ func TestUsingTableTests(t *testing.T) {
 		{testName: "integers", input: strconv.Itoa(10)},
 	}
 
-	setting := NewTestSettings()
-	setting.ScrubInlineGuids()
-	setting.ScrubInlineTime(time.RFC3339)
+	v := NewTestVerifier(t).Configure(
+		verifier.ScrubInlineGuids(),
+		verifier.ScrubInlineTime(time.RFC3339))
 
 	for _, tc := range tests {
-		setting.TestCase(tc.testName)
-		verifier.VerifyWithSetting(t, setting, tc.input)
+		v = v.Configure(verifier.TestCase(tc.testName))
+		v.Verify(tc.input)
 	}
 }
 
@@ -222,13 +225,14 @@ func TestUsingTableTestsWithSubTests(t *testing.T) {
 		{testName: "integers", input: strconv.Itoa(10)},
 	}
 
-	setting := NewTestSettings()
-	setting.ScrubInlineGuids()
-	setting.ScrubInlineTime(time.RFC3339)
+	v := NewTestVerifier(t).Configure(
+		verifier.ScrubInlineGuids(),
+		verifier.ScrubInlineTime(time.RFC3339))
 
 	for _, tc := range tests {
 		t.Run(tc.testName, func(t *testing.T) {
-			verifier.VerifyWithSetting(t, setting, tc.input)
+			v = v.Configure(verifier.TestCase(tc.testName))
+			v.Verify(tc.input)
 		})
 	}
 }
@@ -245,14 +249,14 @@ func TestUsingTableTestsWithSubTestsAndExplicitTestCaseName(t *testing.T) {
 		{testName: "with integers", input: strconv.Itoa(10)},
 	}
 
-	setting := NewTestSettings()
-	setting.ScrubInlineGuids()
-	setting.ScrubInlineTime(time.RFC3339)
+	v := NewTestVerifier(t).Configure(
+		verifier.ScrubInlineGuids(),
+		verifier.ScrubInlineTime(time.RFC3339))
 
 	for _, tc := range tests {
 		t.Run(tc.testName, func(t *testing.T) {
-			setting.TestCase("case-" + tc.testName[5:])
-			verifier.VerifyWithSetting(t, setting, tc.input)
+			v = v.Configure(verifier.TestCase("case-" + tc.testName[5:]))
+			v.Verify(tc.input)
 		})
 	}
 }

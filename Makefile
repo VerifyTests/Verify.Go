@@ -11,21 +11,22 @@ run-vet:
 	echo "Vetting..."
 	go vet ./...
 
-run-tests:
-	echo "Running unit tests for 'verifier'..."
+test-verifier:
 	go test -v ./verifier/*.go
 
-	echo "Running api tests for 'verifier'..."
+test-api:
 	go test -v ./api-tests/*.go
 
-	echo "Running unit tests for 'diff'..."
+test-diff:
 	go test -v ./diff/*.go
 
-	echo "Running unit tests for 'utils'..."
+test-utils:
 	go test -v ./utils/*.go
 
-	echo "Running unit tests for 'tray'..."
+test-tray:
 	go test -v ./tray/*.go
+
+run-tests: test-verifier test-api test-diff test-utils test-tray
 
 run-integration-test: export RUN_INTEGRATION_TESTS=True
 run-integration-test:

@@ -1,6 +1,7 @@
 package verifier
 
 import (
+	"bytes"
 	"github.com/VerifyTests/Verify.Go/utils"
 	"strings"
 )
@@ -20,7 +21,7 @@ func (c *compare) Text(filePair FilePair, received string, settings *verifySetti
 	}
 
 	verified := strings.Builder{}
-	verified.Write(utils.File.ReadText(filePair.VerifiedPath))
+	verified.Write(utils.File.ReadFile(filePair.VerifiedPath))
 
 	result := compareStrings(filePair.Extension, received, verified.String(), settings)
 	if result.IsEqual {
@@ -49,6 +50,38 @@ func compareStrings(extension string, received string, verified string, settings
 	return CompareResult{IsEqual: isEqual}
 }
 
-func (c *compare) Streams(FilePair, []byte, *verifySettings, bool) EqualityResult {
-	panic("not implemented")
+func (c *compare) Streams(filePair FilePair, receivedStream []byte, settings *verifySettings) EqualityResult {
+
+	if !utils.File.Exists(filePair.VerifiedPath) {
+		utils.File.WriteStream(filePair.ReceivedPath, receivedStream)
+		return EqualityResult{
+			Equality: FileNew,
+		}
+	}
+
+	if utils.File.GetLength(filePair.VerifiedPath) == 0 {
+		utils.File.WriteStream(filePair.ReceivedPath, receivedStream)
+		return EqualityResult{
+			Equality: FileNotEqual,
+		}
+	}
+
+	if utils.File.GetLength(filePair.VerifiedPath) != int64(len(receivedStream)) {
+		utils.File.WriteStream(filePair.ReceivedPath, receivedStream)
+		return EqualityResult{
+			Equality: FileNotEqual,
+		}
+	}
+
+	verifiedStream := utils.File.ReadFile(filePair.VerifiedPath)
+	if !bytes.Equal(verifiedStream, receivedStream) {
+		utils.File.WriteStream(filePair.ReceivedPath, receivedStream)
+		return EqualityResult{
+			Equality: FileNotEqual,
+		}
+	}
+
+	return EqualityResult{
+		Equality: FileEqual,
+	}
 }
