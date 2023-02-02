@@ -95,31 +95,31 @@ func (b *failingMessageBuilder) appendContent(builder *strings.Builder) {
 		return
 	}
 
-	builder.WriteString("\n\nFileContent:\n\n")
+	builder.WriteString("\nFileContent:\n")
 
 	if len(newContentFiles) > 0 {
-		builder.WriteString("New:\n\n")
+		builder.WriteString("New:\n")
 		for _, item := range newContentFiles {
-			builder.WriteString("Received: " + item.ReceivedName + "\n")
-			builder.Write(utils.File.ReadText(item.ReceivedPath))
+			builder.WriteString(fmt.Sprintf("  - Received: %s\n", item.ReceivedName))
+			builder.Write(utils.File.ReadFile(item.ReceivedPath))
 			builder.WriteString("\n")
 		}
 	}
 
 	if len(notEqualContentFiles) > 0 {
-		builder.WriteString("NotEqual:\n\n")
+		builder.WriteString("  NotEqual:\n")
 		for _, item := range notEqualContentFiles {
 			if len(item.Message) == 0 {
-				builder.WriteString(fmt.Sprintf("Received: %s\n", item.File.ReceivedName))
-				builder.Write(utils.File.ReadText(item.File.ReceivedPath))
+				builder.WriteString(fmt.Sprintf("  - Received: %s\n", item.File.ReceivedName))
+				builder.Write(utils.File.ReadFile(item.File.ReceivedPath))
 				builder.WriteRune('\n')
-				builder.WriteString(fmt.Sprintf("Verified: %s\n", item.File.VerifiedName))
-				builder.Write(utils.File.ReadText(item.File.VerifiedPath))
+				builder.WriteString(fmt.Sprintf("    Verified: %s\n", item.File.ReceivedName))
+				builder.Write(utils.File.ReadFile(item.File.VerifiedPath))
 				builder.WriteRune('\n')
 			} else {
-				builder.WriteString(fmt.Sprintf("Received: %s\n", item.File.ReceivedName))
-				builder.WriteString(fmt.Sprintf("Verified: %s\n", item.File.VerifiedName))
-				builder.WriteString(fmt.Sprintf("Compare Result: %s\n", item.Message))
+				builder.WriteString(fmt.Sprintf("  - Received: %s\n", item.File.ReceivedName))
+				builder.WriteString(fmt.Sprintf("    Verified: %s\n", item.File.VerifiedName))
+				builder.WriteString(fmt.Sprintf("    Compare Result: %s\n", item.Message))
 			}
 			builder.WriteString("\n")
 		}

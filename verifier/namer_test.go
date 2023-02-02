@@ -6,35 +6,29 @@ import (
 
 func TestNamerUniqueness(t *testing.T) {
 
-	testCases := map[string]func(VerifySettings){
-		"runtime": func(s VerifySettings) {
-			s.UniqueForRuntime()
+	testCases := map[string]VerifyConfigure{
+		"runtime": UniqueForRuntime(),
+		"arch":    UniqueForArchitecture(),
+		"os":      UniqueForOperatingSystem(),
+		"os/arch": func(s *verifySettings) {
+			s.uniqueForArchitecture = true
+			s.uniqueForOperatingSystem = true
 		},
-		"arch": func(s VerifySettings) {
-			s.UniqueForArchitecture()
+		"os/runtime": func(s *verifySettings) {
+			s.uniqueForOperatingSystem = true
+			s.uniqueForRuntime = true
 		},
-		"os": func(s VerifySettings) {
-			s.UniqueForOperatingSystem()
-		},
-		"os/arch": func(s VerifySettings) {
-			s.UniqueForOperatingSystem()
-			s.UniqueForArchitecture()
-		},
-		"os/runtime": func(s VerifySettings) {
-			s.UniqueForOperatingSystem()
-			s.UniqueForRuntime()
-		},
-		"os/runtime/arch": func(s VerifySettings) {
-			s.UniqueForOperatingSystem()
-			s.UniqueForRuntime()
-			s.UniqueForArchitecture()
+		"os/runtime/arch": func(s *verifySettings) {
+			s.uniqueForArchitecture = true
+			s.uniqueForOperatingSystem = true
+			s.uniqueForRuntime = true
 		},
 	}
 
 	for name, test := range testCases {
 		t.Run(name, func(t *testing.T) {
 
-			setting := newSettings()
+			setting := newSettings(t)
 			test(setting)
 			namer := newNamer(setting)
 			result := namer.getUniqueness()

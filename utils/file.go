@@ -18,7 +18,7 @@ type Files struct {
 // File an instance of the Files struct.
 var File = Files{}
 
-// GetDirectoriesFromRoot returns the list of directories in a root directory, including all inner sub directories
+// GetDirectoriesFromRoot returns the list of directories in a root directory, including all inner sub-directories
 func (f *Files) GetDirectoriesFromRoot(root string) ([]string, error) {
 	matches := make([]string, 0)
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
@@ -101,8 +101,8 @@ func (f *Files) WriteText(filePath string, text string) {
 	}
 }
 
-// ReadText reads the content of the file as []byte
-func (f *Files) ReadText(filePath string) []byte {
+// ReadFile reads the content of the file as []byte
+func (f *Files) ReadFile(filePath string) []byte {
 	buf := bytes.NewBuffer(nil)
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -251,6 +251,31 @@ func (f *Files) IsText(extensionOrPath string) bool {
 // GetFileName returns the name of the file from the path
 func (f *Files) GetFileName(path string) string {
 	return filepath.Base(path)
+}
+
+// WriteStream writes a stream to a file
+func (f *Files) WriteStream(path string, stream []byte) {
+	f.tryCreateDir(path)
+
+	file, err := os.Create(path)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to create file: %s", path))
+	}
+
+	defer f.close(file)
+
+	_, err = file.Write(stream)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to write file: %s", path))
+	}
+}
+
+func (f *Files) GetLength(path string) int64 {
+	fi, err := os.Stat(path)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to get file info: %s", path))
+	}
+	return fi.Size()
 }
 
 // From https://github.com/sindresorhus/text-extensions/blob/master/text-extensions.json

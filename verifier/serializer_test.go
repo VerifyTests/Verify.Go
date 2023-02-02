@@ -39,7 +39,7 @@ func TestSerializeAndDeserialize(t *testing.T) {
 		Dob:        time.Date(2000, 10, 1, 0, 0, 0, 0, time.UTC),
 	}
 
-	serializer := getTestSerializer(true, false)
+	serializer := getTestSerializer(t, true, false)
 	serialized := serializer.Serialize(person)
 
 	if len(serialized) == 0 {
@@ -75,7 +75,7 @@ func TestSerializeScrubbedTime(t *testing.T) {
 		Dob:        time.Date(2000, 10, 1, 0, 0, 0, 0, time.Local),
 	}
 
-	serializer := getTestSerializer(true, true)
+	serializer := getTestSerializer(t, true, true)
 	serialized := serializer.Serialize(person)
 
 	if len(serialized) == 0 {
@@ -93,7 +93,7 @@ func TestSerializeScrubbedZeroTime(t *testing.T) {
 		Dob:        time.Time{},
 	}
 
-	serializer := getTestSerializer(true, true)
+	serializer := getTestSerializer(t, true, true)
 	serialized := serializer.Serialize(person)
 
 	if len(serialized) == 0 {
@@ -111,7 +111,7 @@ func TestSerializeNonScrubbedZeroTime(t *testing.T) {
 		Dob:        time.Time{},
 	}
 
-	serializer := getTestSerializer(true, false)
+	serializer := getTestSerializer(t, true, false)
 	serialized := serializer.Serialize(person)
 
 	if len(serialized) == 0 {
@@ -130,7 +130,7 @@ func TestSerializeScrubbedStringTypes(t *testing.T) {
 		DateStringValue: time.Now().Format(time.RFC3339),
 	}
 
-	serializer := getTestSerializer(true, true)
+	serializer := getTestSerializer(t, true, true)
 	serialized := serializer.Serialize(person)
 
 	if len(serialized) == 0 {
@@ -155,7 +155,7 @@ func TestSerializeNotScrubbedStringTypes(t *testing.T) {
 		DateStringValue: time.Now().Format(time.RFC3339),
 	}
 
-	serializer := getTestSerializer(false, false)
+	serializer := getTestSerializer(t, false, false)
 	serialized := serializer.Serialize(person)
 
 	if len(serialized) == 0 {
@@ -178,7 +178,7 @@ func TestSerializeStringBuilder(t *testing.T) {
 	builder.WriteString("FirstValue")
 	builder.WriteString("\tSecondValue")
 
-	serializer := getTestSerializer(true, true)
+	serializer := getTestSerializer(t, true, true)
 	serialized := serializer.Serialize(builder)
 
 	if len(serialized) == 0 {
@@ -196,7 +196,7 @@ func TestSerializeMultiLineString(t *testing.T) {
 	builder.WriteString("SecondValue\r\n")
 	builder.WriteString("ThirdValue\n")
 
-	serializer := getTestSerializer(true, true)
+	serializer := getTestSerializer(t, true, true)
 	serialized := serializer.Serialize(builder)
 	t.Logf("Serialized: %s", serialized)
 
@@ -219,7 +219,7 @@ func TestSerializeStringerInterface(t *testing.T) {
 	ip := net.IPv4(192, 168, 0, 1)
 	stringer := fmt.Stringer(ip) //ip as stringer
 
-	serializer := getTestSerializer(true, true)
+	serializer := getTestSerializer(t, true, true)
 	serialized := serializer.Serialize(stringer)
 
 	if len(serialized) == 0 {
@@ -230,16 +230,16 @@ func TestSerializeStringerInterface(t *testing.T) {
 	}
 }
 
-func getTestSerializer(scrubGuid, scrubTime bool) *serializer {
-	settings := NewSettings()
+func getTestSerializer(t *testing.T, scrubGuid, scrubTime bool) *serializer {
+	settings := newSettings(t)
 	if !scrubGuid {
-		settings.DontScrubGuids()
+		DontScrubGuids()(settings)
 	}
 
 	if !scrubTime {
-		settings.DontScrubTimes()
+		DontScrubTimes()(settings)
 	}
 
-	serializer := newSerializer(settings.(*verifySettings), newDataScrubber(startCounter()))
+	serializer := newSerializer(settings, newDataScrubber(startCounter()))
 	return serializer
 }

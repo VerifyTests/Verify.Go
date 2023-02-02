@@ -211,8 +211,12 @@ func (e *engine) getResult(filePair FilePair, target Target, previousTextHasFail
 		return comparer.Text(filePair, builder.String(), e.settings)
 	}
 
-	var stream = target.GetStreamData()
-	return comparer.Streams(filePair, stream, e.settings, previousTextHasFailed)
+	if target.IsStream() {
+		var stream = target.GetStreamData()
+		return comparer.Streams(filePair, stream, e.settings)
+	}
+
+	panic("target is unsupported")
 }
 
 func (e *engine) runDiffAutoCheck(item FilePair) {

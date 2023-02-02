@@ -129,20 +129,16 @@ The same approach can be used to verify the results where the change to `*.verif
  * **All `*.verified.*` files should be committed to source control.**
  * **All `*.received.*` files should be excluded from source control.**
 
-## Verify Settings
+## Configuring Verify
 
-Settings can be changed by creating an instance of `VerifySettings` interface and using the method that accepts a setting. Default setting will be used otherwise.
+Settings can be configured by calling the `Configure` method on the `Verifier` interface. Default setting will be used, unless otherwise specified.
 
 ```go
-func TestVerifyingString(t *testing.T) {
-    settings := NewSettings()
-    
-    settings.AddScrubber(func(str string) string {
-		return strings.ReplaceAll(str, "String to verify", "new value")
-	})
-
-    verifier.VerifyWithSetting(t, settings, "String to verify")
-}
+verifier.NewVerifier(t,
+   verifier.AddScrubber(func(str string) string {
+       return strings.ReplaceAll(str, "String to verify", "new value")
+   }),
+).Verify("String to verify")
 ```
 
 ## Versioning
@@ -159,7 +155,7 @@ Snapshot changes do not trigger a major version change to avoid causing [Diamond
 
 ## More Documentation
 
-- This is a work in progres...
+- This is a work in progress...
 
 ## Icon
 

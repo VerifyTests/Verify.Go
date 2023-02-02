@@ -38,7 +38,7 @@ func TestErrorReporting(t *testing.T) {
 	deletedFiles := []string{"Deleted1.txt"}
 
 	builder := failingMessageBuilder{
-		settings:      newSettings(),
+		settings:      newSettings(t),
 		testCase:      "ManualTestCase",
 		testName:      t.Name(),
 		directory:     "../_testdata",

@@ -25,8 +25,8 @@ func (t testMarshaller) MarshalText() (text []byte, err error) {
 
 func TestStringVerifier(t *testing.T) {
 
-	settings := newSettings()
-	inner := newInnerVerifier(t, settings)
+	settings := newSettings(t)
+	inner := createInnerVerifier(t, settings)
 
 	if getString(inner, 1) != "1" {
 		t.Fatalf("should correctly convert to string")
