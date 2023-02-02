@@ -17,7 +17,7 @@ func TestGetFileExtension(t *testing.T) {
 }
 
 func TestFileReading(t *testing.T) {
-	content := File.ReadText("../_testdata/verifier_test.TestNilTargets.verified.txt")
+	content := File.ReadText("../_testdata/verifier_test.NilTargets.verified.txt")
 	if len(content) == 0 {
 		t.Fatalf("should read file content")
 	}

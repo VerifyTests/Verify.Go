@@ -40,8 +40,8 @@ func TestCallbacks(t *testing.T) {
 	beforeCalled := false
 
 	//rename to received to cause new
-	_ = os.Rename("../_testdata/verifier_test.TestCallbacks.verified.txt",
-		"../_testdata/verifier_test.TestCallbacks.received.txt")
+	_ = os.Rename("../_testdata/verifier_test.Callbacks.verified.txt",
+		"../_testdata/verifier_test.Callbacks.received.txt")
 
 	settings.UseDirectory("../_testdata")
 	settings.AutoVerify()
